@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -23,7 +24,7 @@ namespace AIMLbot
     /// </summary>
     public class ChatBot
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ChatBot));
+        private static readonly ILog Log = LogManager.GetLogger(typeof (ChatBot));
 
         /// <summary>
         ///     Ctor
@@ -93,7 +94,7 @@ namespace AIMLbot
         /// <summary>
         ///     A dictionary object that looks after all the settings associated with this ChatBot
         /// </summary>
-        public Dictionary<string,string> GlobalSettings;
+        public Dictionary<string, string> GlobalSettings;
 
         /// <summary>
         ///     The "brain" of the ChatBot
@@ -121,12 +122,12 @@ namespace AIMLbot
         /// <summary>
         ///     A dictionary of all the first person to second person (and back) substitutions
         /// </summary>
-        public Dictionary<string,string> Person2Substitutions;
+        public Dictionary<string, string> Person2Substitutions;
 
         /// <summary>
         ///     A dictionary of first / third person substitutions
         /// </summary>
-        public Dictionary<string,string> PersonSubstitutions;
+        public Dictionary<string, string> PersonSubstitutions;
 
         /// <summary>
         ///     The number of categories this ChatBot has in its graphmaster "brain"
@@ -147,7 +148,7 @@ namespace AIMLbot
         /// <summary>
         ///     Generic substitutions that take place during the normalization process
         /// </summary>
-        public Dictionary<string,string> Substitutions;
+        public Dictionary<string, string> Substitutions;
 
         /// <summary>
         ///     If set to false the input from AIML files will undergo the same normalization process that
@@ -158,7 +159,8 @@ namespace AIMLbot
         /// <summary>
         ///     The message to show if a user tries to use the ChatBot whilst it is set to not process user input
         /// </summary>
-        private readonly string _notAcceptMessage = ConfigurationManager.AppSettings.Get("acceptInput", "This ChatBot is currently set to not accept user input.");
+        private readonly string _notAcceptMessage = ConfigurationManager.AppSettings.Get("acceptInput",
+            "This ChatBot is currently set to not accept user input.");
 
         /// <summary>
         ///     The maximum amount of time a request should take (in milliseconds)
@@ -168,7 +170,8 @@ namespace AIMLbot
         /// <summary>
         ///     The message to display in the event of a timeout
         /// </summary>
-        public string TimeOutMessage = ConfigurationManager.AppSettings.Get("timeoutMessage", "ERROR: The request has timed out."); 
+        public string TimeOutMessage = ConfigurationManager.AppSettings.Get("timeoutMessage",
+            "ERROR: The request has timed out.");
 
         /// <summary>
         ///     The locale of the ChatBot as a CultureInfo object
@@ -178,7 +181,8 @@ namespace AIMLbot
         /// <summary>
         ///     Will match all the illegal characters that might be inputted by the user
         /// </summary>
-        public Regex Strippers = ConfigurationManager.AppSettings.Get("stripperregex", new Regex("[^0-9a-zA-Z]", RegexOptions.IgnorePatternWhitespace));
+        public Regex Strippers = ConfigurationManager.AppSettings.Get("stripperregex",
+            new Regex("[^0-9a-zA-Z]", RegexOptions.IgnorePatternWhitespace));
 
         /// <summary>
         ///     Flag to denote if the ChatBot is writing messages to its logs
@@ -192,7 +196,7 @@ namespace AIMLbot
         {
             get
             {
-        var sex = ConfigurationManager.AppSettings.Get("Gender", -1);
+                var sex = ConfigurationManager.AppSettings.Get("Gender", -1);
                 Utils.Gender result;
                 switch (sex)
                 {
@@ -213,7 +217,9 @@ namespace AIMLbot
         /// <summary>
         ///     The directory to look in for the AIML files
         /// </summary>
-        public string PathToAIML => Path.Combine(Environment.CurrentDirectory, ConfigurationManager.AppSettings.Get("aimldirectory", "Aiml"));
+        public string PathToAIML
+            => Path.Combine(Environment.CurrentDirectory, ConfigurationManager.AppSettings.Get("aimldirectory", "Aiml"))
+            ;
 
         #endregion
 
@@ -312,7 +318,7 @@ namespace AIMLbot
                         catch (Exception ex)
                         {
                             Log.Error("WARNING! A problem was encountered when trying to process the input: " +
-                                       request.RawInput + " with the template: \"" + query.Template + "\"", ex);
+                                      request.RawInput + " with the template: \"" + query.Template + "\"", ex);
                         }
                     }
                 }
@@ -344,7 +350,7 @@ namespace AIMLbot
             if (request.StartedOn.AddMilliseconds(request.ChatBot.TimeOut) < DateTime.Now)
             {
                 Log.Error("WARNING! Request timeout. User: " + request.User.UserId + " raw input: \"" +
-                                       request.RawInput + "\" processing template: \"" + query.Template + "\"");
+                          request.RawInput + "\" processing template: \"" + query.Template + "\"");
                 request.HasTimedOut = true;
                 return string.Empty;
             }
@@ -454,7 +460,7 @@ namespace AIMLbot
                         tagHandler = new Version(this, user, query, request, result, node);
                         break;
                     default:
-                        Log.ErrorFormat("Unknown AIML tag: {0}",tagName);
+                        Log.ErrorFormat("Unknown AIML tag: {0}", tagName);
                         break;
                 }
             }
@@ -534,29 +540,55 @@ namespace AIMLbot
         public void SaveToBinaryFile()
         {
             var path = ConfigurationManager.AppSettings.Get("graphMasterFile", "GraphMaster.dat");
-            // check to delete an existing version of the file
-            var fi = new FileInfo(path);
-            if (fi.Exists)
-            {
-                fi.Delete();
-            }
-
-            var saveFile = File.Create(path);
-            var formatter = new BinaryFormatter();
-            formatter.Serialize(saveFile, Graphmaster);
-            saveFile.Close();
+            var fullPath = $@"{Environment.CurrentDirectory}\{path}";
+            SaveToBinaryFile(new FileInfo(fullPath));
         }
 
         /// <summary>
-        ///     Loads a dump of the graphmaster into memory so avoiding processing the AIML files again
+        ///     Saves the graphmaster node (and children) to a binary file to avoid processing the AIML each time the
+        ///     ChatBot starts
+        /// </summary>
+        public void SaveToBinaryFile(FileInfo fileInfo)
+        {
+            if (fileInfo.Exists)
+            {
+                fileInfo.Delete();
+            }
+            using (var stream = fileInfo.Create())
+            {
+                var formatter = new BinaryFormatter();
+                formatter.Serialize(stream, Graphmaster);
+            }
+        }
+
+        /// <summary>
+        /// Loads a dump of the graphmaster into memory so avoiding processing the AIML files again
         /// </summary>
         public void LoadFromBinaryFile()
         {
             var path = ConfigurationManager.AppSettings.Get("graphMasterFile", "GraphMaster.dat");
-            var loadFile = File.OpenRead(path);
-            var bf = new BinaryFormatter();
-            Graphmaster = (Node) bf.Deserialize(loadFile);
-            loadFile.Close();
+            var fullPath = $@"{Environment.CurrentDirectory}\{path}";
+            LoadFromBinaryFile(new FileInfo(fullPath));
+        }
+
+        /// <summary>
+        ///  Loads a dump of the graphmaster into memory so avoiding processing the AIML files again
+        /// </summary>
+        /// <param name="fileInfo">The specific file to load.</param>
+        public void LoadFromBinaryFile(FileInfo fileInfo)
+        {
+            if (fileInfo != null && fileInfo.Exists)
+            {
+                using (var stream = fileInfo.OpenRead())
+                {
+                    var formatter = new BinaryFormatter();
+                    Graphmaster = (Node) formatter.Deserialize(stream);
+                }
+            }
+            else
+            {
+                throw new SerializationException("Unable to deserialize the AIML Graph.");
+            }
         }
 
         #endregion

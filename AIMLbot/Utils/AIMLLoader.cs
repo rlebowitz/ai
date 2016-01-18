@@ -127,21 +127,21 @@ namespace AIMLbot.Utils
         }
 
         /// <summary>
-        ///     Given a "topic" node, processes all the categories for the topic and adds them to the
+        ///     Given a "topic" element, processes all the categories for the topic and adds them to the
         ///     graphmaster "brain"
         /// </summary>
-        /// <param name="node">The "topic" node</param>
-        private void ProcessTopic(XElement node)
+        /// <param name="element">The "topic" element</param>
+        private void ProcessTopic(XElement element)
         {
             // find the name of the topic or set to default "*"
             var topicName = "*";
-            if (node.HasAttributes && node.Attribute("name") != null)
+            if (element.HasAttributes && element.Attribute("name") != null)
             {
-                topicName = node.Attribute("name").Value;
+                topicName = element.Attribute("name").Value;
             }
 
             // process all the category nodes
-            foreach (var thisNode in node.Descendants("category"))
+            foreach (var thisNode in element.Descendants("category"))
             {
                 ProcessCategory(thisNode, topicName);
             }
@@ -150,17 +150,17 @@ namespace AIMLbot.Utils
         /// <summary>
         ///     Adds a category to the graphmaster structure using the given topic
         /// </summary>
-        /// <param name="node">the XML node containing the category</param>
+        /// <param name="element">the XML element containing the category</param>
         /// <param name="topicName">the topic to be used</param>
-        private void ProcessCategory(XElement node, string topicName = "*")
+        private void ProcessCategory(XElement element, string topicName = "*")
         {
             // reference and check the required nodes
-            var pattern = node.Descendants("pattern").FirstOrDefault();
-            var template = node.Descendants("template").FirstOrDefault();
+            var pattern = element.Descendants("pattern").FirstOrDefault();
+            var template = element.Descendants("template").FirstOrDefault();
 
             if (pattern == null)
             {
-                throw new XmlException("Missing pattern tag in the current node");
+                throw new XmlException("Missing pattern tag in the current element");
             }
             if (template == null)
             {
@@ -168,7 +168,7 @@ namespace AIMLbot.Utils
                 throw new XmlException(message);
             }
 
-            var categoryPath = GeneratePath(node, topicName, false);
+            var categoryPath = GeneratePath(element, topicName, false);
             // o.k., add the processed AIML to the GraphMaster structure
             if (categoryPath.Length > 0)
             {
@@ -192,20 +192,20 @@ namespace AIMLbot.Utils
         }
 
         /// <summary>
-        ///     Generates a path from a category XML node and topic name
+        ///     Generates a path from a category XML element and topic name
         /// </summary>
-        /// <param name="node">the category XML node</param>
+        /// <param name="element">the category XML element</param>
         /// <param name="topicName">the topic</param>
         /// <param name="isUserInput">
         ///     marks the path to be created as originating from user input - so
         ///     normalize out the * and _ wildcards used by AIML
         /// </param>
         /// <returns>The appropriately processed path</returns>
-        public string GeneratePath(XElement node, string topicName, bool isUserInput)
+        public string GeneratePath(XElement element, string topicName, bool isUserInput)
         {
             // get the nodes that we need
-            var pattern = node.Descendants("pattern").FirstOrDefault();
-            var that = node.Descendants("that").FirstOrDefault();
+            var pattern = element.Descendants("pattern").FirstOrDefault();
+            var that = element.Descendants("that").FirstOrDefault();
             var thatText = "*";
             var patternText = pattern == null ? string.Empty : string.Concat(pattern.Nodes());
             if (that != null)

@@ -1,3 +1,4 @@
+using System;
 using System.Configuration;
 using System.IO;
 using System.Reflection;
@@ -52,9 +53,10 @@ namespace AIMLbot.UnitTest
         [TestMethod]
         public void TestSaveSerialization()
         {
-            var path = ConfigurationManager.AppSettings.Get("graphMasterFile", "GraphMaster.dat");
             _chatBot.SaveToBinaryFile();
-            var fileInfo = new FileInfo(path);
+            var path = ConfigurationManager.AppSettings.Get("graphMasterFile", "GraphMaster.dat");
+            var fullPath = $@"{Environment.CurrentDirectory}\{path}";
+            var fileInfo = new FileInfo(fullPath);
             Assert.AreEqual(true, fileInfo.Exists);
         }
 
@@ -69,6 +71,10 @@ namespace AIMLbot.UnitTest
         [TestMethod]
         public void TestTimeOutChatWorks()
         {
+            const string path = @"AIML\Srai.aiml";
+            {
+                _loader.LoadAIML(path);
+            }
             var output = _chatBot.Chat("infiniteloop1", "1");
             Assert.AreEqual(true, output.Request.HasTimedOut);
             Assert.AreEqual("ERROR: The request has timed out.", output.Output);
@@ -77,6 +83,10 @@ namespace AIMLbot.UnitTest
         [TestMethod]
         public void TestWildCardsDontMixBetweenSentences()
         {
+            const string path = @"AIML\TestWildcards.aiml";
+            {
+                _loader.LoadAIML(path);
+            }
             var output = _chatBot.Chat("My name is FIRST. My name is SECOND.", "1");
             Assert.AreEqual("Hello FIRST! Hello SECOND!", output.Output);
         }
