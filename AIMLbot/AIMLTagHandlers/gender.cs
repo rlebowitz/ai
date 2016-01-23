@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Configuration;
 using System.Xml;
 using AIMLbot.Utils;
 
@@ -54,18 +52,15 @@ namespace AIMLbot.AIMLTagHandlers
                         // non atomic version of the node
                         return text.Substitute(ChatBot.Genders);
                     }
-                    else
+                    // atomic version of the node
+                    var starNode = GetNode("<star/>");
+                    var recursiveStar = new Star(ChatBot, User, Query, Request, Result, starNode);
+                    TemplateNode.InnerText = recursiveStar.Transform();
+                    if (!string.IsNullOrEmpty(TemplateNode.InnerText))
                     {
-                        // atomic version of the node
-                        var starNode = GetNode("<star/>");
-                        var recursiveStar = new Star(ChatBot, User, Query, Request, Result, starNode);
-                        TemplateNode.InnerText = recursiveStar.Transform();
-                        if (!string.IsNullOrEmpty(TemplateNode.InnerText))
-                        {
-                            continue;
-                        }
-                        return string.Empty;
+                        continue;
                     }
+                    return string.Empty;
                 }
                 return string.Empty;
             }
