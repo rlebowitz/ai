@@ -106,196 +106,197 @@ namespace AIMLbot.Utils
         /// <param name="matchstate">The part of the input path the node represents</param>
         /// <param name="wildcard">The contents of the user input absorbed by the AIML wildcards "_" and "*"</param>
         /// <returns>The template to process to generate the output</returns>
-        public string Evaluate(string path, SubQuery query, Request request, MatchState matchstate,
-                               StringBuilder wildcard)
+        public string Evaluate(string path, SubQuery query, Request request, MatchState matchstate, StringBuilder wildcard)
         {
-            // check for timeout
             var time = ConfigurationManager.AppSettings["timeoutMax"];
             var timeout = Convert.ToInt32(time);
-            if (request.StartedOn.AddMilliseconds(timeout) < DateTime.Now)
+            while (true)
             {
-                Log.Error("WARNING! Request timeout. User: " + request.User.UserId + " raw input: \"" +
-                                       request.RawInput + "\"");
-                request.HasTimedOut = true;
+                // check for timeout
+                if (request.StartedOn.AddMilliseconds(timeout) < DateTime.Now)
+                {
+                    Log.Error("WARNING! Request timeout. User: " + request.User.UserId + " raw input: \"" + request.RawInput + "\"");
+                    request.HasTimedOut = true;
+                    return string.Empty;
+                }
+
+                // so we still have time!
+                path = path.Trim();
+
+                // check if this is the end of a branch in the GraphMaster 
+                // return the cCategory for this node
+                if (_children.Count == 0)
+                {
+                    if (path.Length > 0)
+                    {
+                        // if we get here it means that there is a wildcard in the user input part of the
+                        // path.
+                        StoreWildCard(path, wildcard);
+                    }
+                    return Template;
+                }
+
+                // if we've matched all the words in the input sentence and this is the end
+                // of the line then return the cCategory for this node
+                if (path.Length == 0)
+                {
+                    return Template;
+                }
+
+                // otherwise split the input into it's component words
+                string[] splitPath = path.Split(" \r\n\t".ToCharArray());
+
+                // get the first word of the sentence
+                string firstWord = splitPath[0].ToUpper();
+
+                // and concatenate the rest of the input into a new path for child nodes
+                string newPath = path.Substring(firstWord.Length, path.Length - firstWord.Length);
+
+                // first option is to see if this node has a child denoted by the "_" 
+                // wildcard. "_" comes first in precedence in the AIML alphabet
+                if (_children.ContainsKey("_"))
+                {
+                    Node childNode = _children["_"];
+
+                    // add the next word to the wildcard match 
+                    StringBuilder newWildcard = new StringBuilder();
+                    StoreWildCard(splitPath[0], newWildcard);
+
+                    // move down into the identified branch of the GraphMaster structure
+                    string result = childNode.Evaluate(newPath, query, request, matchstate, newWildcard);
+
+                    // and if we get a result from the branch process the wildcard matches and return 
+                    // the result
+                    if (result.Length > 0)
+                    {
+                        if (newWildcard.Length > 0)
+                        {
+                            // capture and push the star content appropriate to the current matchstate
+                            switch (matchstate)
+                            {
+                                case MatchState.UserInput:
+                                    query.InputStar.Add(newWildcard.ToString());
+                                    // added due to this match being the end of the line
+                                    newWildcard.Remove(0, newWildcard.Length);
+                                    break;
+                                case MatchState.That:
+                                    query.ThatStar.Add(newWildcard.ToString());
+                                    break;
+                                case MatchState.Topic:
+                                    query.TopicStar.Add(newWildcard.ToString());
+                                    break;
+                            }
+                        }
+                        return result;
+                    }
+                }
+
+                // second option - the nodemapper may have contained a "_" child, but led to no match
+                // or it didn't contain a "_" child at all. So get the child nodemapper from this 
+                // nodemapper that matches the first word of the input sentence.
+                if (_children.ContainsKey(firstWord))
+                {
+                    // process the matchstate - this might not make sense but the matchstate is working
+                    // with a "backwards" path: "topic <topic> that <that> user input"
+                    // the "classic" path looks like this: "user input <that> that <topic> topic"
+                    // but having it backwards is more efficient for searching purposes
+                    MatchState newMatchstate = matchstate;
+                    if (firstWord == "<THAT>")
+                    {
+                        newMatchstate = MatchState.That;
+                    }
+                    else if (firstWord == "<TOPIC>")
+                    {
+                        newMatchstate = MatchState.Topic;
+                    }
+
+                    Node childNode = _children[firstWord];
+                    // move down into the identified branch of the GraphMaster structure using the new
+                    // matchstate
+                    StringBuilder newWildcard = new StringBuilder();
+                    string result = childNode.Evaluate(newPath, query, request, newMatchstate, newWildcard);
+                    // and if we get a result from the child return it
+                    if (result.Length > 0)
+                    {
+                        if (newWildcard.Length > 0)
+                        {
+                            // capture and push the star content appropriate to the matchstate if it exists
+                            // and then clear it for subsequent wildcards
+                            switch (matchstate)
+                            {
+                                case MatchState.UserInput:
+                                    query.InputStar.Add(newWildcard.ToString());
+                                    newWildcard.Remove(0, newWildcard.Length);
+                                    break;
+                                case MatchState.That:
+                                    query.ThatStar.Add(newWildcard.ToString());
+                                    newWildcard.Remove(0, newWildcard.Length);
+                                    break;
+                                case MatchState.Topic:
+                                    query.TopicStar.Add(newWildcard.ToString());
+                                    newWildcard.Remove(0, newWildcard.Length);
+                                    break;
+                            }
+                        }
+                        return result;
+                    }
+                }
+
+                // third option - the input part of the path might have been matched so far but hasn't
+                // returned a match, so check to see it contains the "*" wildcard. "*" comes last in
+                // precedence in the AIML alphabet.
+                if (_children.ContainsKey("*"))
+                {
+                    // o.k. look for the path in the child node denoted by "*"
+                    Node childNode = _children["*"];
+
+                    // add the next word to the wildcard match 
+                    StringBuilder newWildcard = new StringBuilder();
+                    StoreWildCard(splitPath[0], newWildcard);
+
+                    string result = childNode.Evaluate(newPath, query, request, matchstate, newWildcard);
+                    // and if we get a result from the branch process and return it
+                    if (result.Length > 0)
+                    {
+                        if (newWildcard.Length > 0)
+                        {
+                            // capture and push the star content appropriate to the current matchstate
+                            switch (matchstate)
+                            {
+                                case MatchState.UserInput:
+                                    query.InputStar.Add(newWildcard.ToString());
+                                    // added due to this match being the end of the line
+                                    newWildcard.Remove(0, newWildcard.Length);
+                                    break;
+                                case MatchState.That:
+                                    query.ThatStar.Add(newWildcard.ToString());
+                                    break;
+                                case MatchState.Topic:
+                                    query.TopicStar.Add(newWildcard.ToString());
+                                    break;
+                            }
+                        }
+                        return result;
+                    }
+                }
+
+                // o.k. if the nodemapper has failed to match at all: the input contains neither 
+                // a "_", the sFirstWord text, or "*" as a means of denoting a child node. However, 
+                // if this node is itself representing a wildcard then the search continues to be
+                // valid if we proceed with the tail.
+                if ((Word == "_") || (Word == "*"))
+                {
+                    StoreWildCard(splitPath[0], wildcard);
+                    path = newPath;
+                    continue;
+                }
+
+                // If we get here then we're at a dead end so return an empty string. Hopefully, if the
+                // AIML files have been set up to include a "* <that> * <topic> *" catch-all this
+                // state won't be reached. Remember to empty the surplus to requirements wildcard matches
+                wildcard.Clear();
                 return string.Empty;
             }
-
-            // so we still have time!
-            path = path.Trim();
-
-            // check if this is the end of a branch in the GraphMaster 
-            // return the cCategory for this node
-            if (_children.Count == 0)
-            {
-                if (path.Length > 0)
-                {
-                    // if we get here it means that there is a wildcard in the user input part of the
-                    // path.
-                    StoreWildCard(path, wildcard);
-                }
-                return Template;
-            }
-
-            // if we've matched all the words in the input sentence and this is the end
-            // of the line then return the cCategory for this node
-            if (path.Length == 0)
-            {
-                return Template;
-            }
-
-            // otherwise split the input into it's component words
-            string[] splitPath = path.Split(" \r\n\t".ToCharArray());
-
-            // get the first word of the sentence
-            string firstWord = splitPath[0].ToUpper();
-
-            // and concatenate the rest of the input into a new path for child nodes
-            string newPath = path.Substring(firstWord.Length, path.Length - firstWord.Length);
-
-            // first option is to see if this node has a child denoted by the "_" 
-            // wildcard. "_" comes first in precedence in the AIML alphabet
-            if (_children.ContainsKey("_"))
-            {
-                Node childNode = _children["_"];
-
-                // add the next word to the wildcard match 
-                StringBuilder newWildcard = new StringBuilder();
-                StoreWildCard(splitPath[0], newWildcard);
-
-                // move down into the identified branch of the GraphMaster structure
-                string result = childNode.Evaluate(newPath, query, request, matchstate, newWildcard);
-
-                // and if we get a result from the branch process the wildcard matches and return 
-                // the result
-                if (result.Length > 0)
-                {
-                    if (newWildcard.Length > 0)
-                    {
-                        // capture and push the star content appropriate to the current matchstate
-                        switch (matchstate)
-                        {
-                            case MatchState.UserInput:
-                                query.InputStar.Add(newWildcard.ToString());
-                                // added due to this match being the end of the line
-                                newWildcard.Remove(0, newWildcard.Length);
-                                break;
-                            case MatchState.That:
-                                query.ThatStar.Add(newWildcard.ToString());
-                                break;
-                            case MatchState.Topic:
-                                query.TopicStar.Add(newWildcard.ToString());
-                                break;
-                        }
-                    }
-                    return result;
-                }
-            }
-
-            // second option - the nodemapper may have contained a "_" child, but led to no match
-            // or it didn't contain a "_" child at all. So get the child nodemapper from this 
-            // nodemapper that matches the first word of the input sentence.
-            if (_children.ContainsKey(firstWord))
-            {
-                // process the matchstate - this might not make sense but the matchstate is working
-                // with a "backwards" path: "topic <topic> that <that> user input"
-                // the "classic" path looks like this: "user input <that> that <topic> topic"
-                // but having it backwards is more efficient for searching purposes
-                MatchState newMatchstate = matchstate;
-                if (firstWord == "<THAT>")
-                {
-                    newMatchstate = MatchState.That;
-                }
-                else if (firstWord == "<TOPIC>")
-                {
-                    newMatchstate = MatchState.Topic;
-                }
-
-                Node childNode = _children[firstWord];
-                // move down into the identified branch of the GraphMaster structure using the new
-                // matchstate
-                StringBuilder newWildcard = new StringBuilder();
-                string result = childNode.Evaluate(newPath, query, request, newMatchstate, newWildcard);
-                // and if we get a result from the child return it
-                if (result.Length > 0)
-                {
-                    if (newWildcard.Length > 0)
-                    {
-                        // capture and push the star content appropriate to the matchstate if it exists
-                        // and then clear it for subsequent wildcards
-                        switch (matchstate)
-                        {
-                            case MatchState.UserInput:
-                                query.InputStar.Add(newWildcard.ToString());
-                                newWildcard.Remove(0, newWildcard.Length);
-                                break;
-                            case MatchState.That:
-                                query.ThatStar.Add(newWildcard.ToString());
-                                newWildcard.Remove(0, newWildcard.Length);
-                                break;
-                            case MatchState.Topic:
-                                query.TopicStar.Add(newWildcard.ToString());
-                                newWildcard.Remove(0, newWildcard.Length);
-                                break;
-                        }
-                    }
-                    return result;
-                }
-            }
-
-            // third option - the input part of the path might have been matched so far but hasn't
-            // returned a match, so check to see it contains the "*" wildcard. "*" comes last in
-            // precedence in the AIML alphabet.
-            if (_children.ContainsKey("*"))
-            {
-                // o.k. look for the path in the child node denoted by "*"
-                Node childNode = _children["*"];
-
-                // add the next word to the wildcard match 
-                StringBuilder newWildcard = new StringBuilder();
-                StoreWildCard(splitPath[0], newWildcard);
-
-                string result = childNode.Evaluate(newPath, query, request, matchstate, newWildcard);
-                // and if we get a result from the branch process and return it
-                if (result.Length > 0)
-                {
-                    if (newWildcard.Length > 0)
-                    {
-                        // capture and push the star content appropriate to the current matchstate
-                        switch (matchstate)
-                        {
-                            case MatchState.UserInput:
-                                query.InputStar.Add(newWildcard.ToString());
-                                // added due to this match being the end of the line
-                                newWildcard.Remove(0, newWildcard.Length);
-                                break;
-                            case MatchState.That:
-                                query.ThatStar.Add(newWildcard.ToString());
-                                break;
-                            case MatchState.Topic:
-                                query.TopicStar.Add(newWildcard.ToString());
-                                break;
-                        }
-                    }
-                    return result;
-                }
-            }
-
-            // o.k. if the nodemapper has failed to match at all: the input contains neither 
-            // a "_", the sFirstWord text, or "*" as a means of denoting a child node. However, 
-            // if this node is itself representing a wildcard then the search continues to be
-            // valid if we proceed with the tail.
-            if ((Word == "_") || (Word == "*"))
-            {
-                StoreWildCard(splitPath[0], wildcard);
-                return Evaluate(newPath, query, request, matchstate, wildcard);
-            }
-
-            // If we get here then we're at a dead end so return an empty string. Hopefully, if the
-            // AIML files have been set up to include a "* <that> * <topic> *" catch-all this
-            // state won't be reached. Remember to empty the surplus to requirements wildcard matches
-            //wildcard = new StringBuilder();
-            wildcard.Clear();// = new StringBuilder();
-            return string.Empty;
         }
 
         /// <summary>
