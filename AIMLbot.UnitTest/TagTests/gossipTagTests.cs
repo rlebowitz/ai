@@ -36,7 +36,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestGossipWithEmpty()
         {
-            XmlNode testNode = StaticHelpers.getNode("<gossip/>");
+            XmlNode testNode = StaticHelpers.GetNode("<gossip/>");
             _botTagHandler = new Gossip(_chatBot, _user, _query, _request, _result, testNode);
             _botTagHandler.Transform();
             Assert.IsFalse(_appender.GetEvents().Any(le => le.Level == Level.Error),
@@ -46,7 +46,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestGossipWithGoodData()
         {
-            XmlNode testNode = StaticHelpers.getNode("<gossip>this is gossip</gossip>");
+            XmlNode testNode = StaticHelpers.GetNode("<gossip>this is gossip</gossip>");
             _botTagHandler = new Gossip(_chatBot, _user, _query, _request, _result, testNode);
             _botTagHandler.Transform();
             var last = _appender.GetEvents().Last();

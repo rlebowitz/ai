@@ -28,7 +28,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestWithBadXml()
         {
-            XmlNode testNode = StaticHelpers.getNode("<od/>");
+            XmlNode testNode = StaticHelpers.GetNode("<od/>");
             _botTagHandler = new Id(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
         }
@@ -36,7 +36,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestWithValidData()
         {
-            XmlNode testNode = StaticHelpers.getNode("<id/>");
+            XmlNode testNode = StaticHelpers.GetNode("<id/>");
             _botTagHandler = new Id(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("1", _botTagHandler.Transform());
         }

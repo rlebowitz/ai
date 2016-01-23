@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using System.Text;
 using AIMLbot.Utils;
@@ -70,7 +69,7 @@ namespace AIMLbot
             ChatBot = chatBot;
             Request = request;
             Request.Result = this;
-             _splitters = ConfigurationManager.GetSection("Splitters") as string[];
+            _splitters = ChatBot.Splitters.ToArray();
         }
 
         /// <summary>

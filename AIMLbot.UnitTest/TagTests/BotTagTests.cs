@@ -28,7 +28,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestBadAttribute()
         {
-            XmlNode testNode = StaticHelpers.getNode("<ChatBot value=\"name\"/>");
+            XmlNode testNode = StaticHelpers.GetNode("<bot value=\"name\"/>");
             _botTagHandler = new Bot(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
         }
@@ -36,7 +36,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestBadNodeName()
         {
-            XmlNode testNode = StaticHelpers.getNode("<bad value=\"name\"/>");
+            XmlNode testNode = StaticHelpers.GetNode("<bad value=\"name\"/>");
             _botTagHandler = new Bot(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
         }
@@ -44,15 +44,15 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestExpectedInput()
         {
-            XmlNode testNode = StaticHelpers.getNode("<ChatBot name= \"name\"/>");
+            XmlNode testNode = StaticHelpers.GetNode("<bot name= \"name\"/>");
             _botTagHandler = new Bot(_chatBot, _user, _query, _request, _result, testNode);
-            Assert.AreEqual("Unknown", _botTagHandler.Transform());
+            Assert.AreEqual("un-named user", _botTagHandler.Transform());
         }
 
         [TestMethod]
         public void TestNonExistentPredicate()
         {
-            XmlNode testNode = StaticHelpers.getNode("<ChatBot name=\"nonexistent\"/>");
+            XmlNode testNode = StaticHelpers.GetNode("<bot name=\"nonexistent\"/>");
             _botTagHandler = new Bot(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
         }
@@ -63,21 +63,23 @@ namespace AIMLbot.UnitTest.TagTests
             string[] predicates = {
                                       "name", "birthday", "birthplace", "boyfriend", "favoriteband", "favoritebook",
                                       "favoritecolor", "favoritefood", "favoritesong", "favoritemovie", "forfun", "friends"
-                                      , "Gender", "girlfriend", "kindmusic", "location", "looklike", "master", "question",
+                                      , "gender", "girlfriend", "kindmusic", "location", "looklike", "master", "question",
                                       "sign", "talkabout", "wear"
                                   };
             foreach (string predicate in predicates)
             {
-                XmlNode testNode = StaticHelpers.getNode("<ChatBot name=\"" + predicate + "\"/>");
+                var tag = $"<bot name=\"{predicate}\" />";
+                var testNode = StaticHelpers.GetNode(tag);
                 _botTagHandler = new Bot(_chatBot, _user, _query, _request, _result, testNode);
-                Assert.AreNotEqual(string.Empty, _botTagHandler.Transform());
+                var transform =_botTagHandler.Transform();
+                Assert.AreNotEqual(string.Empty, transform);
             }
         }
 
         [TestMethod]
         public void TestTooManyAttributes()
         {
-            XmlNode testNode = StaticHelpers.getNode("<ChatBot name=\"name\" value=\"bad\"/>");
+            XmlNode testNode = StaticHelpers.GetNode("<bot name=\"name\" value=\"bad\"/>");
             _botTagHandler = new Bot(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
         }

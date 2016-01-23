@@ -51,7 +51,7 @@ namespace AIMLbot.AIMLTagHandlers
             if (TemplateNode.Name.ToLower() != "that") return string.Empty;
             if (TemplateNode.Attributes != null && TemplateNode.Attributes.Count == 0)
             {
-                return User.getThat();
+                return User.GetThat();
             }
             if (TemplateNode.Attributes == null || TemplateNode.Attributes.Count != 1) return string.Empty;
             if (TemplateNode.Attributes[0].Name.ToLower() != "index") return string.Empty;
@@ -66,7 +66,7 @@ namespace AIMLbot.AIMLTagHandlers
                     int sentence = Convert.ToInt32(dimensions[1].Trim());
                     if ((result > 0) & (sentence > 0))
                     {
-                        return User.getThat(result - 1, sentence - 1);
+                        return User.GetThat(result - 1, sentence - 1);
                     }
                     else
                     {
@@ -80,7 +80,7 @@ namespace AIMLbot.AIMLTagHandlers
                     int result = Convert.ToInt32(TemplateNode.Attributes[0].Value.Trim());
                     if (result > 0)
                     {
-                        return User.getThat(result - 1);
+                        return User.GetThat(result - 1);
                     }
                     Log.Error("ERROR! An input tag with a bady formed index (" +
                               TemplateNode.Attributes[0].Value +

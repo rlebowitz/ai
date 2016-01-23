@@ -45,10 +45,10 @@ namespace AIMLbot.AIMLTagHandlers
                 FileInfo fi = new FileInfo(path);
                 if (fi.Exists)
                 {
-                    XDocument doc = new XDocument(path);
+                    var doc = XDocument.Load(path);
                     try
                     {
-                        ChatBot.LoadAIMLFromXML(doc, path);
+                        ChatBot.LoadAIML(doc);
                     }
                     catch(Exception ex)
                     {

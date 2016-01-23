@@ -46,14 +46,13 @@ namespace AIMLbot.AIMLTagHandlers
         {
             while (true)
             {
-                if (TemplateNode.Name.ToLower() == "Gender")
+                if (TemplateNode.Name.ToLower() == "gender")
                 {
-                    if (TemplateNode.InnerText.Length > 0)
+                    var text = TemplateNode.InnerText;
+                    if (text.Length > 0)
                     {
                         // non atomic version of the node
-                        //return ApplySubstitutions.Substitute(chatBot, chatBot.GenderSubstitutions, TemplateNode.InnerText);
-                        var dictionary = ConfigurationManager.GetSection("Gender") as Dictionary<string, string>;
-                        TemplateNode.InnerText.Substitute(dictionary);
+                        return text.Substitute(ChatBot.Genders);
                     }
                     else
                     {
@@ -69,7 +68,6 @@ namespace AIMLbot.AIMLTagHandlers
                     }
                 }
                 return string.Empty;
-//                break;
             }
         }
     }

@@ -30,7 +30,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestBadInputAttributeName()
         {
-            XmlNode testNode = StaticHelpers.getNode("<star indox=\"3\"/>");
+            XmlNode testNode = StaticHelpers.GetNode("<star indox=\"3\"/>");
             _botTagHandler = new Star(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
         }
@@ -38,7 +38,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestBadInputAttributeValue()
         {
-            XmlNode testNode = StaticHelpers.getNode("<star index=\"one\"/>");
+            XmlNode testNode = StaticHelpers.GetNode("<star index=\"one\"/>");
             _botTagHandler = new Star(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
         }
@@ -46,7 +46,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestBadInputTagName()
         {
-            XmlNode testNode = StaticHelpers.getNode("<stor index=\"1\"/>");
+            XmlNode testNode = StaticHelpers.GetNode("<stor index=\"1\"/>");
             _botTagHandler = new Star(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
         }
@@ -54,7 +54,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestExpectedInput()
         {
-            XmlNode testNode = StaticHelpers.getNode("<star/>");
+            XmlNode testNode = StaticHelpers.GetNode("<star/>");
             _botTagHandler = new Star(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("second star", _botTagHandler.Transform());
         }
@@ -62,7 +62,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestExpectedInputIndex()
         {
-            XmlNode testNode = StaticHelpers.getNode("<star index=\"1\"/>");
+            XmlNode testNode = StaticHelpers.GetNode("<star index=\"1\"/>");
             _botTagHandler = new Star(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("second star", _botTagHandler.Transform());
         }
@@ -70,7 +70,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestExpectedInputIndexOutOfBounds()
         {
-            XmlNode testNode = StaticHelpers.getNode("<star index=\"3\"/>");
+            XmlNode testNode = StaticHelpers.GetNode("<star index=\"3\"/>");
             _botTagHandler = new Star(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
         }
@@ -78,7 +78,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestExpectedInputIndexSecond()
         {
-            XmlNode testNode = StaticHelpers.getNode("<star index=\"2\"/>");
+            XmlNode testNode = StaticHelpers.GetNode("<star index=\"2\"/>");
             _botTagHandler = new Star(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("first star", _botTagHandler.Transform());
         }

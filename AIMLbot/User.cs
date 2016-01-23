@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using AIMLbot.Utils;
 
 namespace AIMLbot
@@ -57,8 +56,7 @@ namespace AIMLbot
             {
                 UserId = userId;
                 ChatBot = chatBot;
-                var dictionary = ConfigurationManager.GetSection("Predicates") as Dictionary<string, string>;
-                Predicates = dictionary.Clone();
+                Predicates = ChatBot.Predicates.Clone();
                 Predicates.Add("topic", "*");
             }
             else
@@ -84,9 +82,9 @@ namespace AIMLbot
         ///     Returns the first sentence of the last output from the ChatBot
         /// </summary>
         /// <returns>the first sentence of the last output from the ChatBot</returns>
-        public string getThat()
+        public string GetThat()
         {
-            return getThat(0, 0);
+            return GetThat(0, 0);
         }
 
         /// <summary>
@@ -94,9 +92,9 @@ namespace AIMLbot
         /// </summary>
         /// <param name="n">the number of steps back to go</param>
         /// <returns>the first sentence of the output "n" steps ago from the ChatBot</returns>
-        public string getThat(int n)
+        public string GetThat(int n)
         {
-            return getThat(n, 0);
+            return GetThat(n, 0);
         }
 
         /// <summary>
@@ -105,7 +103,7 @@ namespace AIMLbot
         /// <param name="n">the number of steps back to go</param>
         /// <param name="sentence">the sentence number to get</param>
         /// <returns>the sentence numbered by "sentence" of the output "n" steps ago from the ChatBot</returns>
-        public string getThat(int n, int sentence)
+        public string GetThat(int n, int sentence)
         {
             if ((n >= 0) & (n < _results.Count))
             {
@@ -122,9 +120,9 @@ namespace AIMLbot
         ///     Returns the first sentence of the last output from the ChatBot
         /// </summary>
         /// <returns>the first sentence of the last output from the ChatBot</returns>
-        public string getResultSentence()
+        public string GetResultSentence()
         {
-            return getResultSentence(0, 0);
+            return GetResultSentence(0, 0);
         }
 
         /// <summary>
@@ -132,9 +130,9 @@ namespace AIMLbot
         /// </summary>
         /// <param name="n">the number of steps back to go</param>
         /// <returns>the first sentence from the output from the ChatBot "n" steps ago</returns>
-        public string getResultSentence(int n)
+        public string GetResultSentence(int n)
         {
-            return getResultSentence(n, 0);
+            return GetResultSentence(n, 0);
         }
 
         /// <summary>
@@ -143,7 +141,7 @@ namespace AIMLbot
         /// <param name="n">the number of steps back to go</param>
         /// <param name="sentence">the sentence number to return</param>
         /// <returns>the identified sentence number from the output from the ChatBot "n" steps ago</returns>
-        public string getResultSentence(int n, int sentence)
+        public string GetResultSentence(int n, int sentence)
         {
             if ((n >= 0) & (n < _results.Count))
             {

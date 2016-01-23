@@ -28,7 +28,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestBadInput()
         {
-            XmlNode testNode = StaticHelpers.getNode("<vorsion/>");
+            XmlNode testNode = StaticHelpers.GetNode("<vorsion/>");
             _botTagHandler = new Version(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
         }
@@ -36,9 +36,9 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestExpectedInput()
         {
-            XmlNode testNode = StaticHelpers.getNode("<version/>");
+            XmlNode testNode = StaticHelpers.GetNode("<version/>");
             _botTagHandler = new Version(_chatBot, _user, _query, _request, _result, testNode);
-            Assert.AreEqual("Unknown", _botTagHandler.Transform());
+            Assert.AreEqual("unknown", _botTagHandler.Transform());
         }
     }
 }

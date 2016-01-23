@@ -52,7 +52,7 @@ namespace AIMLbot.AIMLTagHandlers
             if (TemplateNode.Name.ToLower() != "input") return string.Empty;
             if (TemplateNode.Attributes != null && TemplateNode.Attributes.Count == 0)
             {
-                return User.getResultSentence();
+                return User.GetResultSentence();
             }
             if (TemplateNode.Attributes != null && TemplateNode.Attributes.Count == 1)
             {
@@ -70,7 +70,7 @@ namespace AIMLbot.AIMLTagHandlers
                                 int sentence = Convert.ToInt32(dimensions[1].Trim());
                                 if ((result > 0) & (sentence > 0))
                                 {
-                                    return User.getResultSentence(result - 1, sentence - 1);
+                                    return User.GetResultSentence(result - 1, sentence - 1);
                                 }
                                 else
                                 {
@@ -84,7 +84,7 @@ namespace AIMLbot.AIMLTagHandlers
                                 int result = Convert.ToInt32(TemplateNode.Attributes[0].Value.Trim());
                                 if (result > 0)
                                 {
-                                    return User.getResultSentence(result - 1);
+                                    return User.GetResultSentence(result - 1);
                                 }
                                 else
                                 {

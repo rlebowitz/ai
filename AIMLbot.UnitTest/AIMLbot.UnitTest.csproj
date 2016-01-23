@@ -60,7 +60,6 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AIMLLoaderTests.cs" />
-    <Compile Include="CustomTagTests.cs" />
     <Compile Include="ChatBotTests.cs" />
     <Compile Include="Normalize\ApplySubstitutionsTests.cs" />
     <Compile Include="Normalize\MakeCaseInsensitiveTests.cs" />

@@ -28,7 +28,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestEmptyInput()
         {
-            XmlNode testNode = StaticHelpers.getNode("<uppercase/>");
+            XmlNode testNode = StaticHelpers.GetNode("<uppercase/>");
             _botTagHandler = new Uppercase(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
         }
@@ -36,7 +36,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestExpectedInput()
         {
-            XmlNode testNode = StaticHelpers.getNode("<uppercase>this is a test</uppercase>");
+            XmlNode testNode = StaticHelpers.GetNode("<uppercase>this is a test</uppercase>");
             _botTagHandler = new Uppercase(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("THIS IS A TEST", _botTagHandler.Transform());
         }

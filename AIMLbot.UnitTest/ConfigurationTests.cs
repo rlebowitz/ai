@@ -24,9 +24,9 @@ namespace AIMLbot.UnitTest
         [TestMethod]
         public void TestSplitters()
         {
-            var config = ConfigurationManager.GetSection("Splitters") as string[];
+            var config = ChatBot.Splitters;
             Assert.IsNotNull(config);
-            Assert.IsTrue(config.Length == 4);
+            Assert.IsTrue(config.Count == 4);
         }
 
 

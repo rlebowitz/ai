@@ -27,7 +27,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestSystemIsNotImplemented()
         {
-            var testNode = StaticHelpers.getNode("<system/>");
+            var testNode = StaticHelpers.GetNode("<system/>");
             _botTagHandler = new SystemTag(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
         }

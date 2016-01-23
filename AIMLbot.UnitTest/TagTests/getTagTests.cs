@@ -27,7 +27,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestWithBadAttribute()
         {
-            var testNode = StaticHelpers.getNode("<get nome=\"we\"/>");
+            var testNode = StaticHelpers.GetNode("<get nome=\"we\"/>");
             _botTagHandler = new Get(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
         }
@@ -35,7 +35,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestWithBadNode()
         {
-            var testNode = StaticHelpers.getNode("<got name=\"we\"/>");
+            var testNode = StaticHelpers.GetNode("<got name=\"we\"/>");
             _botTagHandler = new Get(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
         }
@@ -44,12 +44,12 @@ namespace AIMLbot.UnitTest.TagTests
         public void TestWithGoodData()
         {
             // first element
-            var testNode = StaticHelpers.getNode("<get name=\"name\"/>");
+            var testNode = StaticHelpers.GetNode("<get name=\"name\"/>");
             _botTagHandler = new Get(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("un-named user", _botTagHandler.Transform());
 
             // last element
-            testNode = StaticHelpers.getNode("<get name=\"we\"/>");
+            testNode = StaticHelpers.GetNode("<get name=\"we\"/>");
             _botTagHandler = new Get(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("unknown", _botTagHandler.Transform());
         }
@@ -57,7 +57,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestWithNoAttributes()
         {
-            var testNode = StaticHelpers.getNode("<get/>");
+            var testNode = StaticHelpers.GetNode("<get/>");
             _botTagHandler = new Get(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
         }
@@ -65,7 +65,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestWithNonExistentPredicate()
         {
-            var testNode = StaticHelpers.getNode("<get name=\"nonexistent\"/>");
+            var testNode = StaticHelpers.GetNode("<get name=\"nonexistent\"/>");
             _botTagHandler = new Get(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
         }
@@ -73,7 +73,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestWithTooManyAttributes()
         {
-            var testNode = StaticHelpers.getNode("<get name=\"we\" value=\"value\" />");
+            var testNode = StaticHelpers.GetNode("<get name=\"we\" value=\"value\" />");
             _botTagHandler = new Get(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
         }

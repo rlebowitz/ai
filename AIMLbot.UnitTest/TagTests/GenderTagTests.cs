@@ -27,7 +27,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestAtomic()
         {
-            var testNode = StaticHelpers.getNode("<gender/>");
+            var testNode = StaticHelpers.GetNode("<gender/>");
             _botTagHandler = new Gender(_chatBot, _user, _query, _request, _result, testNode);
             _query.InputStar.Insert(0, " HE SHE TO HIM TO HER HIS HER HIM ");
             Assert.AreEqual(" she he to her to him her his her ", _botTagHandler.Transform());
@@ -36,7 +36,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestEmptyInput()
         {
-            var testNode = StaticHelpers.getNode("<Gender/>");
+            var testNode = StaticHelpers.GetNode("<Gender/>");
             _botTagHandler = new Gender(_chatBot, _user, _query, _request, _result, testNode);
             _query.InputStar.Clear();
             Assert.AreEqual("", _botTagHandler.Transform());
@@ -45,7 +45,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestNoMatches()
         {
-            var testNode = StaticHelpers.getNode("<Gender>THE QUICK BROWN FOX JUMPED OVER THE LAZY DOGS</Gender>");
+            var testNode = StaticHelpers.GetNode("<gender>THE QUICK BROWN FOX JUMPED OVER THE LAZY DOGS</gender>");
             _botTagHandler = new Gender(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("THE QUICK BROWN FOX JUMPED OVER THE LAZY DOGS", _botTagHandler.Transform());
         }
@@ -54,8 +54,8 @@ namespace AIMLbot.UnitTest.TagTests
         public void TestNonAtomic()
         {
             var testNode =
-                StaticHelpers.getNode(
-                    "<Gender> HE SHE TO HIM FOR HIM WITH HIM ON HIM IN HIM TO HER FOR HER WITH HER ON HER IN HER HIS HER HIM </Gender>");
+                StaticHelpers.GetNode(
+                    "<gender> HE SHE TO HIM FOR HIM WITH HIM ON HIM IN HIM TO HER FOR HER WITH HER ON HER IN HER HIS HER HIM </gender>");
             _botTagHandler = new Gender(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual(
                 " she he to her for her with her on her in her to him for him with him on him in him her his her ",

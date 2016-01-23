@@ -42,8 +42,8 @@ namespace AIMLbot.AIMLTagHandlers
             {
                 if (TemplateNode.Attributes == null || TemplateNode.Attributes.Count != 1) return string.Empty;
                 if (TemplateNode.Attributes[0].Name.ToLower() != "name") return string.Empty;
-                string key = TemplateNode.Attributes["name"].Value;
-                return ConfigurationManager.AppSettings.Get(key, string.Empty);
+                var key = TemplateNode.Attributes["name"].Value;
+                return ChatBot.Predicates.ContainsKey(key) ? ChatBot.Predicates[key] : string.Empty;
             }
             return string.Empty;
         }

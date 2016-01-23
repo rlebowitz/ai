@@ -120,7 +120,6 @@
     <template>
       <think>
         <set name="temp">a</set>
-
         <condition name="temp" value="a">
           <set name="temp2">1</set>
         </condition>

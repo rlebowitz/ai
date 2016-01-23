@@ -44,19 +44,19 @@ namespace AIMLbot.Utils
         public void LoadAIML()
         {
             var s = ConfigurationManager.AppSettings.Get("aimlPath", "AIML");
-            if (File.Exists(s))
+            var path = $@"{Environment.CurrentDirectory}\{s}";
+            if (Directory.Exists(path))
             {
-                LoadAIML(s);
+                LoadAIML(path);
             }
         }
 
         /// <summary>
-        ///     Loads the AIML from files found in the path
+        /// Loads AIML files from a directory or full path string.
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="path">The directory containing AIML files, or the full path to a single file.</param>
         public void LoadAIML(string path)
         {
-            path = $@"{Environment.CurrentDirectory}\{path}";
             var attr = File.GetAttributes(path);
             if (attr.HasFlag(FileAttributes.Directory) && Directory.Exists(path))
             {
@@ -76,34 +76,39 @@ namespace AIMLbot.Utils
             }
             else
             {
-                if (File.Exists(path))
-                {
-                    var doc = XDocument.Load(path);
-                    LoadAIML(doc);
-                }
-                else
-                {
-                    var message = $"The file {path} cannot be found";
-                    throw new FileNotFoundException(message);
-                }
+                var fileInfo = new FileInfo(path);
+                LoadAIML(fileInfo);
+            }
+        }
+
+        public void LoadAIML(FileInfo fileInfo)
+        {
+            if (fileInfo.Exists)
+            {
+                var doc = XDocument.Load(fileInfo.FullName);
+                LoadAIML(doc);
+            }
+            else
+            {
+                var message = $"The file {fileInfo.FullName} cannot be found";
+                throw new FileNotFoundException(message);
             }
         }
 
         /// <summary>
-        ///     Load the graphmaster from the AIML stream.
+        /// Load the graphmaster from an AIML file or string stream.
         /// </summary>
-        /// <param name="stream">The stream to process</param>
+        /// <param name="stream">The specified AIML stream.</param>
         public void LoadAIML(Stream stream)
         {
-            var doc = XDocument.Load(stream, LoadOptions.None);
+            var doc = XDocument.Load(stream);
             LoadAIML(doc);
         }
 
-
         /// <summary>
-        ///     Given an XML document containing valid AIML, attempts to load it into the graphmaster
+        ///  Load the graphmaster from an XDocument.
         /// </summary>
-        /// <param name="doc">The XML document containing the AIML</param>
+        /// <param name="doc">The XDocument containing the AIML.</param>
         public void LoadAIML(XDocument doc)
         {
             // Get a list of the nodes that are children of the <aiml> tag
@@ -127,10 +132,10 @@ namespace AIMLbot.Utils
         }
 
         /// <summary>
-        ///     Given a "topic" element, processes all the categories for the topic and adds them to the
-        ///     graphmaster "brain"
+        /// Processes all the categories for the specific topic and add 
+        /// them to the graphmaster.
         /// </summary>
-        /// <param name="element">The "topic" element</param>
+        /// <param name="element">The specified topic category</param>
         private void ProcessTopic(XElement element)
         {
             // find the name of the topic or set to default "*"
@@ -141,41 +146,40 @@ namespace AIMLbot.Utils
             }
 
             // process all the category nodes
-            foreach (var thisNode in element.Descendants("category"))
+            foreach (var category in element.Descendants("category"))
             {
-                ProcessCategory(thisNode, topicName);
+                ProcessCategory(category, topicName);
             }
         }
 
         /// <summary>
-        ///     Adds a category to the graphmaster structure using the given topic
+        ///  Processes and adds a category to the graphmaster structure for the specified topic.
         /// </summary>
-        /// <param name="element">the XML element containing the category</param>
-        /// <param name="topicName">the topic to be used</param>
-        private void ProcessCategory(XElement element, string topicName = "*")
+        /// <param name="category">The specified AIML category.</param>
+        /// <param name="topicName">The specified AIML topic.</param>
+        private void ProcessCategory(XElement category, string topicName = "*")
         {
-            // reference and check the required nodes
-            var pattern = element.Descendants("pattern").FirstOrDefault();
-            var template = element.Descendants("template").FirstOrDefault();
-
+            var pattern = category.Descendants("pattern").FirstOrDefault();
             if (pattern == null)
             {
-                throw new XmlException("Missing pattern tag in the current element");
+                throw new XmlException("Missing pattern tag in the current category");
             }
+
+            var template = category.Descendants("template").FirstOrDefault();
             if (template == null)
             {
                 var message = $"Missing template tag in the node with pattern: {string.Concat(pattern.Nodes())}";
                 throw new XmlException(message);
             }
 
-            var categoryPath = GeneratePath(element, topicName, false);
-            // o.k., add the processed AIML to the GraphMaster structure
+            var categoryPath = GeneratePath(category, topicName, false);
+            // Add the processed AIML to the GraphMaster structure
+            // Track the number of categories that have been processed
             if (categoryPath.Length > 0)
             {
                 try
                 {
                     _chatBot.Graphmaster.AddCategory(categoryPath, template.ToString());
-                    // keep count of the number of categories that have been processed
                     _chatBot.Size++;
                 }
                 catch
@@ -186,15 +190,15 @@ namespace AIMLbot.Utils
             }
             else
             {
-                var message = $"Unable to load category with an empty pattern with path {categoryPath}";
+                var message = $"The category {categoryPath} had an empty pattern.";
                 Log.Error(message);
             }
         }
 
         /// <summary>
-        ///     Generates a path from a category XML element and topic name
+        ///     Generates a path from a category XML category and topic name
         /// </summary>
-        /// <param name="element">the category XML element</param>
+        /// <param name="element">the category XML category</param>
         /// <param name="topicName">the topic</param>
         /// <param name="isUserInput">
         ///     marks the path to be created as originating from user input - so
@@ -292,9 +296,7 @@ namespace AIMLbot.Utils
             var builder = new StringBuilder();
 
             // objects for normalization of the input
-//            StripIllegalCharacters stripper = new StripIllegalCharacters(_chatBot);
-            var substitutions = ConfigurationManager.GetSection("Substitutions") as Dictionary<string, string>;
-            var substitutedInput = input.Substitute(substitutions);
+            var substitutedInput = input.Substitute(ChatBot.Substitutions);
             // split the pattern into it's component words
             var substitutedWords = substitutedInput.Split(" \r\n\t".ToCharArray());
 

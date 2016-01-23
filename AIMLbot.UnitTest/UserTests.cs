@@ -66,7 +66,7 @@ namespace AIMLbot.UnitTest
         public void TestResultHandlers()
         {
             _user = new User("1", _chatBot);
-            Assert.AreEqual("", _user.getResultSentence());
+            Assert.AreEqual("", _user.GetResultSentence());
             var mockRequest = new Request("Sentence 1. Sentence 2", _user, _chatBot);
             var mockResult = new Result(_user, _chatBot, mockRequest);
             mockResult.InputSentences.Add("Result 1");
@@ -80,20 +80,20 @@ namespace AIMLbot.UnitTest
             mockResult2.OutputSentences.Add("Result 3");
             mockResult2.OutputSentences.Add("Result 4");
             _user.AddResult(mockResult2);
-            Assert.AreEqual("Result 3", _user.getResultSentence());
-            Assert.AreEqual("Result 3", _user.getResultSentence(0));
-            Assert.AreEqual("Result 1", _user.getResultSentence(1));
-            Assert.AreEqual("Result 4", _user.getResultSentence(0, 1));
-            Assert.AreEqual("Result 2", _user.getResultSentence(1, 1));
-            Assert.AreEqual("", _user.getResultSentence(0, 2));
-            Assert.AreEqual("", _user.getResultSentence(2, 0));
-            Assert.AreEqual("Result 3", _user.getThat());
-            Assert.AreEqual("Result 3", _user.getThat(0));
-            Assert.AreEqual("Result 1", _user.getThat(1));
-            Assert.AreEqual("Result 4", _user.getThat(0, 1));
-            Assert.AreEqual("Result 2", _user.getThat(1, 1));
-            Assert.AreEqual("", _user.getThat(0, 2));
-            Assert.AreEqual("", _user.getThat(2, 0));
+            Assert.AreEqual("Result 3", _user.GetResultSentence());
+            Assert.AreEqual("Result 3", _user.GetResultSentence(0));
+            Assert.AreEqual("Result 1", _user.GetResultSentence(1));
+            Assert.AreEqual("Result 4", _user.GetResultSentence(0, 1));
+            Assert.AreEqual("Result 2", _user.GetResultSentence(1, 1));
+            Assert.AreEqual("", _user.GetResultSentence(0, 2));
+            Assert.AreEqual("", _user.GetResultSentence(2, 0));
+            Assert.AreEqual("Result 3", _user.GetThat());
+            Assert.AreEqual("Result 3", _user.GetThat(0));
+            Assert.AreEqual("Result 1", _user.GetThat(1));
+            Assert.AreEqual("Result 4", _user.GetThat(0, 1));
+            Assert.AreEqual("Result 2", _user.GetThat(1, 1));
+            Assert.AreEqual("", _user.GetThat(0, 2));
+            Assert.AreEqual("", _user.GetThat(2, 0));
         }
     }
 }

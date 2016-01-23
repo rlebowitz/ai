@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Xml;
 using AIMLbot.AIMLTagHandlers;
 using AIMLbot.Utils;
@@ -15,23 +16,27 @@ namespace AIMLbot.UnitTest.TagTests
         private Result _result;
         private SubQuery _query;
         private Size _botTagHandler;
+        private AIMLLoader _loader;
 
-        public static int Size = 30;
+        public static int Size = 16;
 
         [TestInitialize]
         public void Setup()
         {
             _chatBot = new ChatBot();
+            _loader = new AIMLLoader(_chatBot);
             _user = new User("1", _chatBot);
             _request = new Request("This is a test", _user, _chatBot);
             _query = new SubQuery("This is a test <that> * <topic> *");
             _result = new Result(_user, _chatBot, _request);
+            var path = $@"{Environment.CurrentDirectory}\AIML\Salutations.aiml";
+            _loader.LoadAIML(path);
         }
 
         [TestMethod]
         public void TestWithBadXml()
         {
-            XmlNode testNode = StaticHelpers.getNode("<soze/>");
+            XmlNode testNode = StaticHelpers.GetNode("<soze/>");
             _botTagHandler = new Size(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
         }
@@ -39,11 +44,8 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestWithValidData()
         {
-            XmlNode testNode = StaticHelpers.getNode("<size/>");
+            XmlNode testNode = StaticHelpers.GetNode("<size/>");
             _botTagHandler = new Size(_chatBot, _user, _query, _request, _result, testNode);
-            Assert.AreEqual("0", _botTagHandler.Transform());
-            AIMLLoader loader = new AIMLLoader(_chatBot);
-            loader.LoadAIML();
             Assert.AreEqual(Convert.ToString(Size), _botTagHandler.Transform());
         }
     }

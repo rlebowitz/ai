@@ -48,7 +48,7 @@ namespace AIMLbot.AIMLTagHandlers
                 if (TemplateNode.InnerText.Length > 0)
                 {
                     // non atomic version of the node
-                    return TemplateNode.InnerText.Substitute(ChatBot.Person2Substitutions);
+                    return TemplateNode.InnerText.Substitute(ChatBot.Person2);
                 }
                 // atomic version of the node
                 var starNode = GetNode("<star/>");

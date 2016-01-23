@@ -28,7 +28,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestAtomic()
         {
-            XmlNode testNode = StaticHelpers.getNode("<person/>");
+            XmlNode testNode = StaticHelpers.GetNode("<person/>");
             _botTagHandler = new Person(_chatBot, _user, _query, _request, _result, testNode);
             _query.InputStar.Insert(0, " I WAS HE WAS SHE WAS I AM I ME MY MYSELF ");
             Assert.AreEqual(" he or she was I was I was he or she is he or she him or her his or her him or herself ",
@@ -38,7 +38,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestEmptyInput()
         {
-            XmlNode testNode = StaticHelpers.getNode("<person/>");
+            XmlNode testNode = StaticHelpers.GetNode("<person/>");
             _botTagHandler = new Person(_chatBot, _user, _query, _request, _result, testNode);
             _query.InputStar.Clear();
             Assert.AreEqual("", _botTagHandler.Transform());
@@ -47,7 +47,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestNoMatches()
         {
-            XmlNode testNode = StaticHelpers.getNode("<person>THE QUICK BROWN FOX JUMPED OVER THE LAZY DOGS</person>");
+            XmlNode testNode = StaticHelpers.GetNode("<person>THE QUICK BROWN FOX JUMPED OVER THE LAZY DOGS</person>");
             _botTagHandler = new Person(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("THE QUICK BROWN FOX JUMPED OVER THE LAZY DOGS", _botTagHandler.Transform());
         }
@@ -55,7 +55,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestNonAtomic()
         {
-            XmlNode testNode = StaticHelpers.getNode("<person> I WAS HE WAS SHE WAS I AM I ME MY MYSELF </person>");
+            XmlNode testNode = StaticHelpers.GetNode("<person> I WAS HE WAS SHE WAS I AM I ME MY MYSELF </person>");
             _botTagHandler = new Person(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual(" he or she was I was I was he or she is he or she him or her his or her him or herself ",
                             _botTagHandler.Transform());

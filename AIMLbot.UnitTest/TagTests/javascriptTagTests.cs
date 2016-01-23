@@ -28,7 +28,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestJavascriptIsNotImplemented()
         {
-            XmlNode testNode = StaticHelpers.getNode("<javascript/>");
+            XmlNode testNode = StaticHelpers.GetNode("<javascript/>");
             _botTagHandler = new Javascript(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
         }

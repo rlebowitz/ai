@@ -1,7 +1,6 @@
 using System;
 using System.Configuration;
 using System.IO;
-using System.Reflection;
 using AIMLbot.Utils;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -37,7 +36,7 @@ namespace AIMLbot.UnitTest
         //public void TestLoadFromAIML()
         //{
         //    _chatBot = new ChatBot();
-        //    _chatBot.LoadAIMLFromFiles();
+        //    _chatBot.LoadAIML();
         //    Assert.AreEqual(sizeTagTests.Size, _chatBot.Size);
         //}
 

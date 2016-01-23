@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Configuration;
 using System.Xml;
 using AIMLbot.Utils;
 
@@ -55,20 +53,15 @@ namespace AIMLbot.AIMLTagHandlers
                 if (TemplateNode.InnerText.Length > 0)
                 {
                     // non atomic version of the node
-                    var persons = ConfigurationManager.GetSection("Person") as Dictionary<string, string>;
-                    TemplateNode.InnerText.Substitute(persons);
+                    return TemplateNode.InnerText.Substitute(ChatBot.Person);
                 }
-                else
+                // atomic version of the node
+                var starNode = GetNode("<star/>");
+                var recursiveStar = new Star(ChatBot, User, Query, Request, Result, starNode);
+                TemplateNode.InnerText = recursiveStar.Transform();
+                if (!string.IsNullOrEmpty(TemplateNode.InnerText))
                 {
-                    // atomic version of the node
-                    XmlNode starNode = GetNode("<star/>");
-                    Star recursiveStar = new Star(ChatBot, User, Query, Request, Result, starNode);
-                    TemplateNode.InnerText = recursiveStar.Transform();
-                    if (!string.IsNullOrEmpty(TemplateNode.InnerText))
-                    {
-                        continue;
-                    }
-                    return string.Empty;
+                    continue;
                 }
                 return string.Empty;
             }

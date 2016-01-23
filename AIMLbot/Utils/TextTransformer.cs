@@ -21,24 +21,21 @@ namespace AIMLbot.Utils
         /// <summary>
         /// Instance of the input string
         /// </summary>
-        protected string inputString;
+        private string _inputString;
 
         /// <summary>
         /// The input string to be transformed in some way
         /// </summary>
         public string InputString
         {
-            get { return inputString; }
-            set { inputString = value; }
+            get { return _inputString; }
+            set { _inputString = value; }
         }
 
         /// <summary>
         /// The transformed string
         /// </summary>
-        public string OutputString
-        {
-            get { return Transform(); }
-        }
+        public string OutputString => Transform();
 
         #endregion
 
@@ -47,29 +44,29 @@ namespace AIMLbot.Utils
         /// </summary>
         /// <param name="chatBot">The ChatBot this transformer is a part of</param>
         /// <param name="inputString">The input string to be transformed</param>
-        public TextTransformer(ChatBot chatBot, string inputString)
+        protected TextTransformer(ChatBot chatBot, string inputString)
         {
-            this.ChatBot = chatBot;
-            this.inputString = inputString;
+            ChatBot = chatBot;
+            _inputString = inputString;
         }
 
         /// <summary>
         /// ctor
         /// </summary>
         /// <param name="chatBot">The ChatBot this transformer is a part of</param>
-        public TextTransformer(ChatBot chatBot)
+        protected TextTransformer(ChatBot chatBot)
         {
-            this.ChatBot = chatBot;
-            inputString = string.Empty;
+            ChatBot = chatBot;
+            _inputString = string.Empty;
         }
 
         /// <summary>
         /// Default ctor for used as part of late binding mechanism
         /// </summary>
-        public TextTransformer()
+        protected TextTransformer()
         {
             ChatBot = null;
-            inputString = string.Empty;
+            _inputString = string.Empty;
         }
 
         /// <summary>
@@ -79,7 +76,7 @@ namespace AIMLbot.Utils
         /// <returns>The resulting output</returns>
         public string Transform(string input)
         {
-            inputString = input;
+            _inputString = input;
             return Transform();
         }
 
@@ -89,14 +86,7 @@ namespace AIMLbot.Utils
         /// <returns>The resulting transformed string</returns>
         public string Transform()
         {
-            if (inputString.Length > 0)
-            {
-                return ProcessChange();
-            }
-            else
-            {
-                return string.Empty;
-            }
+            return _inputString.Length > 0 ? ProcessChange() : string.Empty;
         }
 
         /// <summary>

@@ -1,3 +1,4 @@
+using System;
 using System.Xml;
 using AIMLbot.AIMLTagHandlers;
 using AIMLbot.Utils;
@@ -19,7 +20,8 @@ namespace AIMLbot.UnitTest.TagTests
         public void Setup()
         {
             _chatBot = new ChatBot();
-            _chatBot.LoadAIMLFromFiles();
+            var filePath = $@"{Environment.CurrentDirectory}\AIML\Srai.aiml";
+            _chatBot.LoadAIML(filePath);
             _user = new User("1", _chatBot);
             _request = new Request("This is a test", _user, _chatBot);
             _query = new SubQuery("This is a test <that> * <topic> *");
@@ -31,7 +33,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestSRAIBad()
         {
-            XmlNode testNode = StaticHelpers.getNode("<srui>srainested</srui>");
+            XmlNode testNode = StaticHelpers.GetNode("<srui>srainested</srui>");
             _botTagHandler = new Srai(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
         }
@@ -39,7 +41,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestSRAIEmpty()
         {
-            XmlNode testNode = StaticHelpers.getNode("<srai/>");
+            XmlNode testNode = StaticHelpers.GetNode("<srai/>");
             _botTagHandler = new Srai(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
         }
@@ -47,7 +49,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestSRAIRecursion()
         {
-            XmlNode testNode = StaticHelpers.getNode("<srai>srainested</srai>");
+            XmlNode testNode = StaticHelpers.GetNode("<srai>srainested</srai>");
             _botTagHandler = new Srai(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("Test passed.", _botTagHandler.Transform());
         }
@@ -55,7 +57,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestSRAIWithValidInput()
         {
-            XmlNode testNode = StaticHelpers.getNode("<srai>sraisucceeded</srai>");
+            XmlNode testNode = StaticHelpers.GetNode("<srai>sraisucceeded</srai>");
             _botTagHandler = new Srai(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("Test passed.", _botTagHandler.Transform());
         }

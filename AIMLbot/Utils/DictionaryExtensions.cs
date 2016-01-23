@@ -13,5 +13,15 @@ namespace AIMLbot.Utils
             }
             return dictionary;
         }
+
+        public static void AddOrReplace(this Dictionary<string, string> original, string key, string value)
+        {
+            if (!original.ContainsKey(key))
+            {
+                original.Add(key, value);
+                return;
+            }
+            original[key] = value;
+        }
     }
 }

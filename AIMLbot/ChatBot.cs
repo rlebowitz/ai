@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
@@ -13,7 +12,8 @@ using System.Xml.Linq;
 using AIMLbot.AIMLTagHandlers;
 using AIMLbot.Utils;
 using log4net;
-using Gender = AIMLbot.AIMLTagHandlers.Gender;
+using Gender = AIMLbot.Utils.Gender;
+using Random = AIMLbot.AIMLTagHandlers.Random;
 using Version = AIMLbot.AIMLTagHandlers.Version;
 
 namespace AIMLbot
@@ -26,75 +26,12 @@ namespace AIMLbot
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof (ChatBot));
 
-        /// <summary>
-        ///     Ctor
-        /// </summary>
         public ChatBot()
         {
-            Setup();
+            Graphmaster = new Node();
         }
-
-        #region Latebinding custom-tag dll handlers
-
-        /// <summary>
-        ///     Loads any custom tag handlers found in the dll referenced in the argument
-        /// </summary>
-        /// <param name="pathToDLL">the path to the dll containing the custom tag handling code</param>
-        public void LoadCustomTagHandlers(string pathToDLL)
-        {
-            var tagDLL = Assembly.LoadFrom(pathToDLL);
-            var tagDLLTypes = tagDLL.GetTypes();
-            foreach (var t in tagDLLTypes)
-            {
-                var typeCustomAttributes = t.GetCustomAttributes(false);
-                foreach (var attribute in typeCustomAttributes)
-                {
-                    if (attribute is CustomTagAttribute)
-                    {
-                        // We've found a custom tag handling class
-                        // so store the assembly and store it away in the Dictionary<,> as a TagHandler class for 
-                        // later usage
-
-                        // store Assembly
-                        if (!_lateBindingAssemblies.ContainsKey(tagDLL.FullName))
-                        {
-                            _lateBindingAssemblies.Add(tagDLL.FullName, tagDLL);
-                        }
-
-                        // create the TagHandler representation
-                        var newTagHandler = new TagHandler
-                        {
-                            AssemblyName = tagDLL.FullName,
-                            ClassName = t.FullName,
-                            TagName = t.Name.ToLower()
-                        };
-                        if (CustomTags.ContainsKey(newTagHandler.TagName))
-                        {
-                            throw new Exception("ERROR! Unable to add the custom tag: <" + newTagHandler.TagName +
-                                                ">, found in: " + pathToDLL +
-                                                " as a handler for this tag already exists.");
-                        }
-                        CustomTags.Add(newTagHandler.TagName, newTagHandler);
-                    }
-                }
-            }
-        }
-
-        #endregion
 
         #region Attributes
-
-        /// <summary>
-        ///     Holds information about the available custom tag handling classes (if loaded)
-        ///     Key = class name
-        ///     Value = TagHandler class that provides information about the class
-        /// </summary>
-        public Dictionary<string, TagHandler> CustomTags { get; private set; }
-
-        /// <summary>
-        ///     A dictionary object that looks after all the settings associated with this ChatBot
-        /// </summary>
-        public Dictionary<string, string> GlobalSettings;
 
         /// <summary>
         ///     The "brain" of the ChatBot
@@ -107,11 +44,6 @@ namespace AIMLbot
         public bool IsAcceptingUserInput { get; set; } = true;
 
         /// <summary>
-        ///     Holds references to the assemblies that hold the custom tag handling code.
-        /// </summary>
-        private readonly Dictionary<string, Assembly> _lateBindingAssemblies = new Dictionary<string, Assembly>();
-
-        /// <summary>
         ///     The maximum number of characters a "that" element of a path is allowed to be. Anything above
         ///     this length will cause "that" to be "*". This is to avoid having the graphmaster process
         ///     huge "that" elements in the path that might have been caused by the ChatBot reporting third party
@@ -119,15 +51,18 @@ namespace AIMLbot
         /// </summary>
         public int MaxThatSize = 256;
 
+       public static Dictionary<string,string> Genders = ConfigurationManager.GetSection("Gender") as Dictionary<string, string>;
         /// <summary>
         ///     A dictionary of all the first person to second person (and back) substitutions
         /// </summary>
-        public Dictionary<string, string> Person2Substitutions;
+        public static Dictionary<string, string> Person2 = ConfigurationManager.GetSection("Person2") as Dictionary<string, string>;
 
         /// <summary>
         ///     A dictionary of first / third person substitutions
         /// </summary>
-        public Dictionary<string, string> PersonSubstitutions;
+        public static Dictionary<string, string> Person = ConfigurationManager.GetSection("Person") as Dictionary<string, string>;
+
+        public static Dictionary<string,string> Predicates = ConfigurationManager.GetSection("Predicates") as Dictionary<string, string>;
 
         /// <summary>
         ///     The number of categories this ChatBot has in its graphmaster "brain"
@@ -138,7 +73,7 @@ namespace AIMLbot
         ///     A List containing the tokens used to split the input into sentences during the
         ///     normalization process
         /// </summary>
-        public List<string> Splitters = new List<string>();
+        public static List<string> Splitters = ConfigurationManager.GetSection("Splitters") as List<string>;
 
         /// <summary>
         ///     When the ChatBot was initialised
@@ -148,7 +83,7 @@ namespace AIMLbot
         /// <summary>
         ///     Generic substitutions that take place during the normalization process
         /// </summary>
-        public Dictionary<string, string> Substitutions;
+        public static Dictionary<string, string> Substitutions = ConfigurationManager.GetSection("Gender") as Dictionary<string, string>;
 
         /// <summary>
         ///     If set to false the input from AIML files will undergo the same normalization process that
@@ -192,22 +127,22 @@ namespace AIMLbot
         /// <summary>
         ///     The supposed sex of the ChatBot
         /// </summary>
-        public Utils.Gender Sex
+        public Gender Sex
         {
             get
             {
                 var sex = ConfigurationManager.AppSettings.Get("Gender", -1);
-                Utils.Gender result;
+                Gender result;
                 switch (sex)
                 {
                     case 0:
-                        result = Utils.Gender.Female;
+                        result = Gender.Female;
                         break;
                     case 1:
-                        result = Utils.Gender.Male;
+                        result = Gender.Male;
                         break;
                     default:
-                        result = Utils.Gender.Unknown;
+                        result = Gender.Unknown;
                         break;
                 }
                 return result;
@@ -228,31 +163,28 @@ namespace AIMLbot
         /// <summary>
         ///     Loads AIML from .aiml files into the graphmaster "brain" of the ChatBot
         /// </summary>
-        public void LoadAIMLFromFiles()
+        public void LoadAIML()
         {
             var loader = new AIMLLoader(this);
             loader.LoadAIML();
+        }
+
+        public void LoadAIML(string path)
+        {
+            var loader = new AIMLLoader(this);
+            loader.LoadAIML(path);
         }
 
         /// <summary>
         ///     Allows the ChatBot to load a new XML version of some AIML
         /// </summary>
         /// <param name="newAIML">The XML document containing the AIML</param>
-        /// <param name="filename">The originator of the XML document</param>
-        public void LoadAIMLFromXML(XDocument newAIML, string filename)
+        public void LoadAIML(XDocument newAIML)
         {
             var loader = new AIMLLoader(this);
             loader.LoadAIML(newAIML);
         }
 
-        /// <summary>
-        ///     Instantiates the dictionary objects and collections associated with this class
-        /// </summary>
-        private void Setup()
-        {
-            CustomTags = new Dictionary<string, TagHandler>();
-            Graphmaster = new Node();
-        }
 
         #endregion
 
@@ -370,10 +302,8 @@ namespace AIMLbot
                 }
                 return templateResult.ToString();
             }
-            var tagHandler = GetBespokeTags(user, query, request, result, node);
-            if (Equals(null, tagHandler))
-            {
-                switch (tagName)
+            AIMLTagHandler tagHandler = null;
+            switch (tagName)
                 {
                     case "bot":
                         tagHandler = new Bot(this, user, query, request, result, node);
@@ -388,7 +318,7 @@ namespace AIMLbot
                         tagHandler = new Formal(this, user, query, request, result, node);
                         break;
                     case "Gender":
-                        tagHandler = new Gender(this, user, query, request, result, node);
+                        tagHandler = new AIMLTagHandlers.Gender(this, user, query, request, result, node);
                         break;
                     case "get":
                         tagHandler = new Get(this, user, query, request, result, node);
@@ -418,7 +348,7 @@ namespace AIMLbot
                         tagHandler = new Person2(this, user, query, request, result, node);
                         break;
                     case "random":
-                        tagHandler = new AIMLTagHandlers.Random(this, user, query, request, result, node);
+                        tagHandler = new Random(this, user, query, request, result, node);
                         break;
                     case "sentence":
                         tagHandler = new Sentence(this, user, query, request, result, node);
@@ -463,7 +393,6 @@ namespace AIMLbot
                         Log.ErrorFormat("Unknown AIML tag: {0}", tagName);
                         break;
                 }
-            }
             if (Equals(null, tagHandler))
             {
                 return node.InnerText;
@@ -496,37 +425,6 @@ namespace AIMLbot
                 return recursiveResult.ToString();
             }
             return resultNode.InnerXml;
-        }
-
-        /// <summary>
-        ///     Searches the CustomTag collection and processes the AIML if an appropriate tag handler is found
-        /// </summary>
-        /// <param name="user">the user who originated the request</param>
-        /// <param name="query">the query that produced this node</param>
-        /// <param name="request">the request from the user</param>
-        /// <param name="result">the result to be sent to the user</param>
-        /// <param name="node">the node to evaluate</param>
-        /// <returns>the output string</returns>
-        public AIMLTagHandler GetBespokeTags(User user, SubQuery query, Request request, Result result, XmlNode node)
-        {
-            if (CustomTags.ContainsKey(node.Name.ToLower()))
-            {
-                var customTagHandler = CustomTags[node.Name.ToLower()];
-
-                var newCustomTag = customTagHandler.Instantiate(_lateBindingAssemblies);
-                if (Equals(null, newCustomTag))
-                {
-                    return null;
-                }
-                newCustomTag.User = user;
-                newCustomTag.Query = query;
-                newCustomTag.Request = request;
-                newCustomTag.Result = result;
-                newCustomTag.TemplateNode = node;
-                newCustomTag.ChatBot = this;
-                return newCustomTag;
-            }
-            return null;
         }
 
         #endregion
@@ -562,7 +460,7 @@ namespace AIMLbot
         }
 
         /// <summary>
-        /// Loads a dump of the graphmaster into memory so avoiding processing the AIML files again
+        ///     Loads a dump of the graphmaster into memory so avoiding processing the AIML files again
         /// </summary>
         public void LoadFromBinaryFile()
         {
@@ -572,7 +470,7 @@ namespace AIMLbot
         }
 
         /// <summary>
-        ///  Loads a dump of the graphmaster into memory so avoiding processing the AIML files again
+        ///     Loads a dump of the graphmaster into memory so avoiding processing the AIML files again
         /// </summary>
         /// <param name="fileInfo">The specific file to load.</param>
         public void LoadFromBinaryFile(FileInfo fileInfo)

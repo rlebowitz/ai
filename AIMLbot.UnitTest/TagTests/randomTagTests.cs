@@ -31,7 +31,7 @@ namespace AIMLbot.UnitTest.TagTests
         public void TestWithBadListItems()
         {
             var testNode =
-                StaticHelpers.getNode(
+                StaticHelpers.GetNode(
                     @"<random>
     <li>random 1</li>
     <bad>bad 1</bad>
@@ -51,7 +51,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestWithNoListItems()
         {
-            var testNode = StaticHelpers.getNode("<random/>");
+            var testNode = StaticHelpers.GetNode("<random/>");
             _botTagHandler = new Random(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
         }
@@ -60,7 +60,7 @@ namespace AIMLbot.UnitTest.TagTests
         public void TestWithValidData()
         {
             var testNode =
-                StaticHelpers.getNode(
+                StaticHelpers.GetNode(
                     @"<random>
     <li>random 1</li>
     <li>random 2</li>

@@ -29,7 +29,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestBadInput()
         {
-            XmlNode testNode = StaticHelpers.getNode("<dote/>");
+            XmlNode testNode = StaticHelpers.GetNode("<dote/>");
             _botTagHandler = new Date(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
         }
@@ -37,7 +37,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestExpectedInput()
         {
-            XmlNode testNode = StaticHelpers.getNode("<date/>");
+            XmlNode testNode = StaticHelpers.GetNode("<date/>");
             _botTagHandler = new Date(_chatBot, _user, _query, _request, _result, testNode);
             DateTime now = DateTime.Now;
             DateTime expected = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);

@@ -19,7 +19,7 @@ namespace AIMLbot.Utils
             {
                 var elements = root.Descendants("item")
                     .Select(p => p.Attribute("value").Value)
-                    .ToArray();
+                    .ToList();
                 return elements;
             }
             catch (Exception ex)

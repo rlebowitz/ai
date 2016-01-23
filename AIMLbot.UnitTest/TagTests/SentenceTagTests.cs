@@ -28,7 +28,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestAtomic()
         {
-            XmlNode testNode = StaticHelpers.getNode("<sentence/>");
+            XmlNode testNode = StaticHelpers.GetNode("<sentence/>");
             _botTagHandler = new Sentence(_chatBot, _user, _query, _request, _result, testNode);
             _query.InputStar.Insert(0, "THIS IS. A TEST TO? SEE IF THIS; WORKS! OK");
             Assert.AreEqual("This is. A test to? See if this; Works! Ok", _botTagHandler.Transform());
@@ -37,7 +37,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestEmptyInput()
         {
-            XmlNode testNode = StaticHelpers.getNode("<sentence/>");
+            XmlNode testNode = StaticHelpers.GetNode("<sentence/>");
             _botTagHandler = new Sentence(_chatBot, _user, _query, _request, _result, testNode);
             _query.InputStar.Clear();
             Assert.AreEqual("", _botTagHandler.Transform());
@@ -46,7 +46,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestNonAtomicLower()
         {
-            XmlNode testNode = StaticHelpers.getNode("<sentence>this is. a test to? see if this; works! ok</sentence>");
+            XmlNode testNode = StaticHelpers.GetNode("<sentence>this is. a test to? see if this; works! ok</sentence>");
             _botTagHandler = new Sentence(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("This is. A test to? See if this; Works! Ok", _botTagHandler.Transform());
         }
@@ -54,7 +54,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestNonAtomicUpper()
         {
-            XmlNode testNode = StaticHelpers.getNode("<sentence>THIS IS. A TEST TO? SEE IF THIS; WORKS! OK</sentence>");
+            XmlNode testNode = StaticHelpers.GetNode("<sentence>THIS IS. A TEST TO? SEE IF THIS; WORKS! OK</sentence>");
             _botTagHandler = new Sentence(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("This is. A test to? See if this; Works! Ok", _botTagHandler.Transform());
         }

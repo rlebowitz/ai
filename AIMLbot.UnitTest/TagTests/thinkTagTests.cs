@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Xml;
 using AIMLbot.AIMLTagHandlers;
@@ -26,6 +27,9 @@ namespace AIMLbot.UnitTest.TagTests
             BasicConfigurator.Configure(_appender);
 
             _chatBot = new ChatBot();
+            var filePath = $@"{Environment.CurrentDirectory}\AIML\ChatBotTests.aiml";
+            _chatBot.LoadAIML(filePath);
+
             _user = new User("1", _chatBot);
             _request = new Request("This is a test", _user, _chatBot);
             _query = new SubQuery("This is a test <that> * <topic> *");
@@ -35,7 +39,6 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestAsPartOfLargerTemplate()
         {
-            _chatBot.LoadAIMLFromFiles();
             Result newResult = _chatBot.Chat("test think", "1");
             Assert.AreEqual("You should see this.", newResult.RawOutput);
         }
@@ -43,7 +46,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestExpectedInput()
         {
-            XmlNode testNode = StaticHelpers.getNode("<think>This is a test</think>");
+            XmlNode testNode = StaticHelpers.GetNode("<think>This is a test</think>");
             _botTagHandler = new Think(_chatBot, _user, _query, _request, _result, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
         }
@@ -51,7 +54,6 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestWithChildNodes()
         {
-            _chatBot.LoadAIMLFromFiles();
             Result newResult = _chatBot.Chat("test child think", "1");
             Assert.AreEqual("You should see this.", newResult.RawOutput);
             var last = _appender.GetEvents().Last();

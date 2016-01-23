@@ -29,7 +29,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void testResultHandlers()
         {
-            XmlNode testNode = StaticHelpers.getNode("<input/>");
+            XmlNode testNode = StaticHelpers.GetNode("<input/>");
             Result mockResult = new Result(_user, _chat, _request);
             _botTagHandler = new Input(_chat, _user, _query, _request, mockResult, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
@@ -44,27 +44,27 @@ namespace AIMLbot.UnitTest.TagTests
 
             Assert.AreEqual("Result 3", _botTagHandler.Transform());
 
-            testNode = StaticHelpers.getNode("<input index=\"1\"/>");
+            testNode = StaticHelpers.GetNode("<input index=\"1\"/>");
             _botTagHandler = new Input(_chat, _user, _query, _request, mockResult, testNode);
             Assert.AreEqual("Result 3", _botTagHandler.Transform());
 
-            testNode = StaticHelpers.getNode("<input index=\"2,1\"/>");
+            testNode = StaticHelpers.GetNode("<input index=\"2,1\"/>");
             _botTagHandler = new Input(_chat, _user, _query, _request, mockResult, testNode);
             Assert.AreEqual("Result 1", _botTagHandler.Transform());
 
-            testNode = StaticHelpers.getNode("<input index=\"1,2\"/>");
+            testNode = StaticHelpers.GetNode("<input index=\"1,2\"/>");
             _botTagHandler = new Input(_chat, _user, _query, _request, mockResult, testNode);
             Assert.AreEqual("Result 4", _botTagHandler.Transform());
 
-            testNode = StaticHelpers.getNode("<input index=\"2,2\"/>");
+            testNode = StaticHelpers.GetNode("<input index=\"2,2\"/>");
             _botTagHandler = new Input(_chat, _user, _query, _request, mockResult, testNode);
             Assert.AreEqual("Result 2", _botTagHandler.Transform());
 
-            testNode = StaticHelpers.getNode("<input index=\"1,3\"/>");
+            testNode = StaticHelpers.GetNode("<input index=\"1,3\"/>");
             _botTagHandler = new Input(_chat, _user, _query, _request, mockResult, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
 
-            testNode = StaticHelpers.getNode("<input index=\"3\"/>");
+            testNode = StaticHelpers.GetNode("<input index=\"3\"/>");
             _botTagHandler = new Input(_chat, _user, _query, _request, mockResult, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
         }
