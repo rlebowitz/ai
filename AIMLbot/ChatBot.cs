@@ -228,8 +228,9 @@ namespace AIMLbot
                 foreach (var path in result.NormalizedPaths)
                 {
                     var query = new SubQuery(path);
-                    query.Template =
-                        Graphmaster.Evaluate(path, query, request, MatchState.UserInput, new StringBuilder());
+                    var searcher = new NodeSearcher(query, request);
+                    query.Template = searcher.Evaluate(Graphmaster, path, MatchState.UserInput, new StringBuilder());
+//                        Graphmaster.Evaluate(path, query, request, MatchState.UserInput, new StringBuilder());
                     result.SubQueries.Add(query);
                 }
 
@@ -317,7 +318,7 @@ namespace AIMLbot
                     case "formal":
                         tagHandler = new Formal(this, user, query, request, result, node);
                         break;
-                    case "Gender":
+                    case "gender":
                         tagHandler = new AIMLTagHandlers.Gender(this, user, query, request, result, node);
                         break;
                     case "get":

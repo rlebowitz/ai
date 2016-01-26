@@ -84,6 +84,7 @@
     <Compile Include="AIMLTagHandlers\Uppercase.cs" />
     <Compile Include="AIMLTagHandlers\Version.cs" />
     <Compile Include="ChatBot.cs" />
+    <Compile Include="NodeSearcher.cs" />
     <Compile Include="Request.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="User.cs" />

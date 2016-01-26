@@ -99,7 +99,7 @@
     <Compile Include="TagTests\UppercaseTagTests.cs" />
     <Compile Include="TagTests\VersionTagTests.cs" />
     <Compile Include="UserTests.cs" />
-    <Compile Include="Utils\NodeTests.cs" />
+    <Compile Include="Utils\NodeSearcherTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AIMLbot\AIMLbot.csproj">
