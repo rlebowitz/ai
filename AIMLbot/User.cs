@@ -11,6 +11,7 @@ namespace AIMLbot
     {
         #region Attributes
 
+        //ToDo: eliminate reference to the ChatBot; should be possible to get reference to static predicate collection.
         /// <summary>
         ///     The ChatBot this user is using
         /// </summary>
