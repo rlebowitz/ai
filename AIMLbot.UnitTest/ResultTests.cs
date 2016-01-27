@@ -5,8 +5,6 @@ namespace AIMLbot.UnitTest
     [TestClass]
     public class ResultTests
     {
-        private ChatBot _chatBot;
-
         private User _user;
 
         private Request _request;
@@ -16,15 +14,14 @@ namespace AIMLbot.UnitTest
         [TestInitialize]
         public void Setup()
         {
-            _chatBot = new ChatBot();
-            _user = new User("1", _chatBot);
-            _request = new Request("This is a test", _user, _chatBot);
+            _user = new User();
+            _request = new Request("This is a test", _user);
         }
 
         [TestMethod]
         public void TestConstructor()
         {
-            _result = new Result(_user, _chatBot, _request);
+            _result = new Result(_user, _request);
             Assert.AreEqual("This is a test", _result.RawInput);
         }
     }

@@ -11,11 +11,6 @@ namespace AIMLbot.Utils
         #region Attributes
 
         /// <summary>
-        /// The path that this query relates to
-        /// </summary>
-//        public string FullPath { get; set; }
-
-        /// <summary>
         /// If the raw input matches a wildcard then this attribute will contain the block of 
         /// text that the user has inputted that is matched by the wildcard.
         /// </summary>
@@ -40,13 +35,5 @@ namespace AIMLbot.Utils
 
         #endregion
 
-        /// <summary>
-        /// Ctor
-        /// </summary>
-        /// <param name="fullPath">The path that this query relates to</param>
-        public SubQuery()
-        {
-//            FullPath = fullPath;
-        }
     }
 }

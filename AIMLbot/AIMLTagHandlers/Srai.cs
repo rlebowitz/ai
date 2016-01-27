@@ -39,8 +39,8 @@ namespace AIMLbot.AIMLTagHandlers
             {
                 if (TemplateNode.InnerText.Length > 0)
                 {
-                    Request subRequest = new Request(TemplateNode.InnerText, User, ChatBot);
-                    subRequest.StartedOn = Request.StartedOn; // make sure we don't keep adding time to the request
+                    // make sure we don't keep adding time to the request
+                    Request subRequest = new Request(TemplateNode.InnerText, User) {StartedOn = Request.StartedOn};
                     Result subQuery = ChatBot.Chat(subRequest);
                     Request.HasTimedOut = subRequest.HasTimedOut;
                     return subQuery.Output;

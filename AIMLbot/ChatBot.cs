@@ -51,18 +51,23 @@ namespace AIMLbot
         /// </summary>
         public int MaxThatSize = 256;
 
-       public static Dictionary<string,string> Genders = ConfigurationManager.GetSection("Gender") as Dictionary<string, string>;
+        public static Dictionary<string, string> Genders =
+            ConfigurationManager.GetSection("Gender") as Dictionary<string, string>;
+
         /// <summary>
         ///     A dictionary of all the first person to second person (and back) substitutions
         /// </summary>
-        public static Dictionary<string, string> Person2 = ConfigurationManager.GetSection("Person2") as Dictionary<string, string>;
+        public static Dictionary<string, string> Person2 =
+            ConfigurationManager.GetSection("Person2") as Dictionary<string, string>;
 
         /// <summary>
         ///     A dictionary of first / third person substitutions
         /// </summary>
-        public static Dictionary<string, string> Person = ConfigurationManager.GetSection("Person") as Dictionary<string, string>;
+        public static Dictionary<string, string> Person =
+            ConfigurationManager.GetSection("Person") as Dictionary<string, string>;
 
-        public static Dictionary<string,string> Predicates = ConfigurationManager.GetSection("Predicates") as Dictionary<string, string>;
+        public static Dictionary<string, string> Predicates =
+            ConfigurationManager.GetSection("Predicates") as Dictionary<string, string>;
 
         /// <summary>
         ///     The number of categories this ChatBot has in its graphmaster "brain"
@@ -83,7 +88,8 @@ namespace AIMLbot
         /// <summary>
         ///     Generic substitutions that take place during the normalization process
         /// </summary>
-        public static Dictionary<string, string> Substitutions = ConfigurationManager.GetSection("Gender") as Dictionary<string, string>;
+        public static Dictionary<string, string> Substitutions =
+            ConfigurationManager.GetSection("Gender") as Dictionary<string, string>;
 
         /// <summary>
         ///     If set to false the input from AIML files will undergo the same normalization process that
@@ -105,7 +111,7 @@ namespace AIMLbot
         /// <summary>
         ///     The message to display in the event of a timeout
         /// </summary>
-        public string TimeOutMessage = ConfigurationManager.AppSettings.Get("timeoutMessage",
+        public static string TimeOutMessage = ConfigurationManager.AppSettings.Get("timeoutMessage",
             "ERROR: The request has timed out.");
 
         /// <summary>
@@ -185,10 +191,20 @@ namespace AIMLbot
             loader.LoadAIML(newAIML);
         }
 
-
         #endregion
 
         #region Conversation methods
+
+        /// <summary>
+        ///     Given some raw input and a unique ID creates a response for a new user
+        /// </summary>
+        /// <param name="rawInput">the raw input</param>
+        /// <returns>the result to be output to the user</returns>
+        public Result Chat(string rawInput)
+        {
+            var request = new Request(rawInput, new User());
+            return Chat(request);
+        }
 
         /// <summary>
         ///     Given some raw input and a unique ID creates a response for a new user
@@ -198,7 +214,7 @@ namespace AIMLbot
         /// <returns>the result to be output to the user</returns>
         public Result Chat(string rawInput, string userGuid)
         {
-            var request = new Request(rawInput, new User(userGuid, this), this);
+            var request = new Request(rawInput, new User(userGuid));
             return Chat(request);
         }
 
@@ -209,7 +225,7 @@ namespace AIMLbot
         /// <returns>the result to be output to the user</returns>
         public Result Chat(Request request)
         {
-            var result = new Result(request.User, this, request);
+            var result = new Result(request.User, request);
 
             if (IsAcceptingUserInput)
             {
@@ -227,12 +243,9 @@ namespace AIMLbot
                 // grab the templates for the various sentences from the graphmaster
                 foreach (var path in result.NormalizedPaths)
                 {
-//                    var query = new SubQuery(path);
-                    var query = new SubQuery();
-                    var searcher = new NodeSearcher(query, request);
-                    query.Template = searcher.Evaluate(Graphmaster, path, MatchState.UserInput, new StringBuilder());
-//                        Graphmaster.Evaluate(path, query, request, MatchState.UserInput, new StringBuilder());
-                    result.SubQueries.Add(query);
+                    var searcher = new NodeSearcher(request);
+                    searcher.Evaluate(Graphmaster, path, MatchState.UserInput, new StringBuilder());
+                    result.SubQueries.Add(searcher.Query);
                 }
 
                 // process the templates into appropriate output
@@ -265,7 +278,6 @@ namespace AIMLbot
             // populate the Result object
             result.Duration = DateTime.Now - request.StartedOn;
             request.User.AddResult(result);
-
             return result;
         }
 
@@ -281,7 +293,7 @@ namespace AIMLbot
         private string ProcessNode(XmlNode node, SubQuery query, Request request, Result result, User user)
         {
             // check for timeout (to avoid infinite loops)
-            if (request.StartedOn.AddMilliseconds(request.ChatBot.TimeOut) < DateTime.Now)
+            if (request.StartedOn.AddMilliseconds(TimeOut) < DateTime.Now)
             {
                 Log.Error("WARNING! Request timeout. User: " + request.User.UserId + " raw input: \"" +
                           request.RawInput + "\" processing template: \"" + query.Template + "\"");
@@ -306,95 +318,95 @@ namespace AIMLbot
             }
             AIMLTagHandler tagHandler = null;
             switch (tagName)
-                {
-                    case "bot":
-                        tagHandler = new Bot(this, user, query, request, result, node);
-                        break;
-                    case "condition":
-                        tagHandler = new Condition(this, user, query, request, result, node);
-                        break;
-                    case "date":
-                        tagHandler = new Date(this, user, query, request, result, node);
-                        break;
-                    case "formal":
-                        tagHandler = new Formal(this, user, query, request, result, node);
-                        break;
-                    case "gender":
-                        tagHandler = new AIMLTagHandlers.Gender(this, user, query, request, result, node);
-                        break;
-                    case "get":
-                        tagHandler = new Get(this, user, query, request, result, node);
-                        break;
-                    case "gossip":
-                        tagHandler = new Gossip(this, user, query, request, result, node);
-                        break;
-                    case "id":
-                        tagHandler = new Id(this, user, query, request, result, node);
-                        break;
-                    case "input":
-                        tagHandler = new Input(this, user, query, request, result, node);
-                        break;
-                    case "javascript":
-                        tagHandler = new Javascript(this, user, query, request, result, node);
-                        break;
-                    case "learn":
-                        tagHandler = new Learn(this, user, query, request, result, node);
-                        break;
-                    case "lowercase":
-                        tagHandler = new Lowercase(this, user, query, request, result, node);
-                        break;
-                    case "person":
-                        tagHandler = new Person(this, user, query, request, result, node);
-                        break;
-                    case "person2":
-                        tagHandler = new Person2(this, user, query, request, result, node);
-                        break;
-                    case "random":
-                        tagHandler = new Random(this, user, query, request, result, node);
-                        break;
-                    case "sentence":
-                        tagHandler = new Sentence(this, user, query, request, result, node);
-                        break;
-                    case "set":
-                        tagHandler = new Set(this, user, query, request, result, node);
-                        break;
-                    case "size":
-                        tagHandler = new Size(this, user, query, request, result, node);
-                        break;
-                    case "sr":
-                        tagHandler = new Sr(this, user, query, request, result, node);
-                        break;
-                    case "srai":
-                        tagHandler = new Srai(this, user, query, request, result, node);
-                        break;
-                    case "star":
-                        tagHandler = new Star(this, user, query, request, result, node);
-                        break;
-                    case "system":
-                        tagHandler = new SystemTag(this, user, query, request, result, node);
-                        break;
-                    case "that":
-                        tagHandler = new That(this, user, query, request, result, node);
-                        break;
-                    case "thatstar":
-                        tagHandler = new ThatStar(this, user, query, request, result, node);
-                        break;
-                    case "think":
-                        tagHandler = new Think(this, user, query, request, result, node);
-                        break;
-                    case "topicstar":
-                        tagHandler = new Topicstar(this, user, query, request, result, node);
-                        break;
-                    case "uppercase":
-                        tagHandler = new Uppercase(this, user, query, request, result, node);
-                        break;
-                    case "version":
-                        tagHandler = new Version(this, user, query, request, result, node);
-                        break;
-                    default:
-                        Log.ErrorFormat("Unknown AIML tag: {0}", tagName);
-                        break;
-                }
+            {
+                case "bot":
+                    tagHandler = new Bot(this, user, query, request, result, node);
+                    break;
+                case "condition":
+                    tagHandler = new Condition(this, user, query, request, result, node);
+                    break;
+                case "date":
+                    tagHandler = new Date(this, user, query, request, result, node);
+                    break;
+                case "formal":
+                    tagHandler = new Formal(this, user, query, request, result, node);
+                    break;
+                case "gender":
+                    tagHandler = new AIMLTagHandlers.Gender(this, user, query, request, result, node);
+                    break;
+                case "get":
+                    tagHandler = new Get(this, user, query, request, result, node);
+                    break;
+                case "gossip":
+                    tagHandler = new Gossip(this, user, query, request, result, node);
+                    break;
+                case "id":
+                    tagHandler = new Id(this, user, query, request, result, node);
+                    break;
+                case "input":
+                    tagHandler = new Input(this, user, query, request, result, node);
+                    break;
+                case "javascript":
+                    tagHandler = new Javascript(this, user, query, request, result, node);
+                    break;
+                case "learn":
+                    tagHandler = new Learn(this, user, query, request, result, node);
+                    break;
+                case "lowercase":
+                    tagHandler = new Lowercase(this, user, query, request, result, node);
+                    break;
+                case "person":
+                    tagHandler = new Person(this, user, query, request, result, node);
+                    break;
+                case "person2":
+                    tagHandler = new Person2(this, user, query, request, result, node);
+                    break;
+                case "random":
+                    tagHandler = new Random(this, user, query, request, result, node);
+                    break;
+                case "sentence":
+                    tagHandler = new Sentence(this, user, query, request, result, node);
+                    break;
+                case "set":
+                    tagHandler = new Set(this, user, query, request, result, node);
+                    break;
+                case "size":
+                    tagHandler = new Size(this, user, query, request, result, node);
+                    break;
+                case "sr":
+                    tagHandler = new Sr(this, user, query, request, result, node);
+                    break;
+                case "srai":
+                    tagHandler = new Srai(this, user, query, request, result, node);
+                    break;
+                case "star":
+                    tagHandler = new Star(this, user, query, request, result, node);
+                    break;
+                case "system":
+                    tagHandler = new SystemTag(this, user, query, request, result, node);
+                    break;
+                case "that":
+                    tagHandler = new That(this, user, query, request, result, node);
+                    break;
+                case "thatstar":
+                    tagHandler = new ThatStar(this, user, query, request, result, node);
+                    break;
+                case "think":
+                    tagHandler = new Think(this, user, query, request, result, node);
+                    break;
+                case "topicstar":
+                    tagHandler = new Topicstar(this, user, query, request, result, node);
+                    break;
+                case "uppercase":
+                    tagHandler = new Uppercase(this, user, query, request, result, node);
+                    break;
+                case "version":
+                    tagHandler = new Version(this, user, query, request, result, node);
+                    break;
+                default:
+                    Log.ErrorFormat("Unknown AIML tag: {0}", tagName);
+                    break;
+            }
             if (Equals(null, tagHandler))
             {
                 return node.InnerText;

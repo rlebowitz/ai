@@ -18,8 +18,8 @@ namespace AIMLbot.UnitTest.TagTests
         public void Setup()
         {
             _chat = new ChatBot();
-            _user = new User("1", _chat);
-            _request = new Request("This is a test", _user, _chat);
+            _user = new User();
+            _request = new Request("This is a test", _user);
             _query = new SubQuery();
             _query.InputStar.Insert(0, "first star");
             _query.InputStar.Insert(0, "second star");
@@ -29,14 +29,14 @@ namespace AIMLbot.UnitTest.TagTests
         public void testResultHandlers()
         {
             XmlNode testNode = StaticHelpers.GetNode("<input/>");
-            Result mockResult = new Result(_user, _chat, _request);
+            Result mockResult = new Result(_user, _request);
             _botTagHandler = new Input(_chat, _user, _query, _request, mockResult, testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
-            _request = new Request("Sentence 1. Sentence 2", _user, _chat);
+            _request = new Request("Sentence 1. Sentence 2", _user);
             mockResult.InputSentences.Add("Result 1");
             mockResult.InputSentences.Add("Result 2");
             _user.AddResult(mockResult);
-            Result mockResult2 = new Result(_user, _chat, _request);
+            Result mockResult2 = new Result(_user, _request);
             mockResult2.InputSentences.Add("Result 3");
             mockResult2.InputSentences.Add("Result 4");
             _user.AddResult(mockResult2);

@@ -12,7 +12,7 @@ namespace AIMLbot
         private static readonly string Time = ConfigurationManager.AppSettings["timeoutMax"];
 
         private Request Request { get; }
-        private SubQuery Query { get; }
+        public SubQuery Query { get; }
         /// <summary>
         /// Used to set the number of milliseconds before the search times out.
         /// </summary>
@@ -21,12 +21,11 @@ namespace AIMLbot
         /// <summary>
         ///     Used to navigate the graph.
         /// </summary>
-        /// <param name="query">The query that this search is for</param>
         /// <param name="request">An encapsulation of the request from the user</param>
-        public NodeSearcher(SubQuery query, Request request)
+        public NodeSearcher(Request request)
         {
-            Query = query;
             Request = request;
+            Query = new SubQuery();
             Timeout = Convert.ToInt32(Time);
         }
 
@@ -74,6 +73,7 @@ namespace AIMLbot
                         // path.
                         StoreWildCard(path, wildcard);
                     }
+                    Query.Template = node.Template;
                     return node.Template;
                 }
 
@@ -81,6 +81,7 @@ namespace AIMLbot
                 // of the line then return the category for this node
                 if (path.Length == 0)
                 {
+                    Query.Template = node.Template;
                     return node.Template;
                 }
 
@@ -128,6 +129,7 @@ namespace AIMLbot
                                     break;
                             }
                         }
+                        Query.Template = result;
                         return result;
                     }
                 }
@@ -179,6 +181,7 @@ namespace AIMLbot
                                     break;
                             }
                         }
+                        Query.Template = result;
                         return result;
                     }
                 }
@@ -216,6 +219,7 @@ namespace AIMLbot
                                     break;
                             }
                         }
+                        Query.Template = result;
                         return result;
                     }
                 }
@@ -235,6 +239,7 @@ namespace AIMLbot
                 // AIML files have been set up to include a "* <that> * <topic> *" catch-all this
                 // state won't be reached. Remember to empty the surplus to requirements wildcard matches
                 wildcard.Clear();
+                Query.Template = string.Empty;
                 return string.Empty;
             }
         }

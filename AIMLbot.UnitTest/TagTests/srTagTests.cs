@@ -22,12 +22,12 @@ namespace AIMLbot.UnitTest.TagTests
             _chatBot = new ChatBot();
             var filePath = $@"{Environment.CurrentDirectory}\AIML\Srai.aiml";
             _chatBot.LoadAIML(filePath);
-            _user = new User("1", _chatBot);
-            _request = new Request("This is a test", _user, _chatBot);
+            _user = new User();
+            _request = new Request("This is a test", _user);
             _query = new SubQuery();
             _query.InputStar.Insert(0, "first star");
             _query.InputStar.Insert(0, "second star");
-            _result = new Result(_user, _chatBot, _request);
+            _result = new Result(_user, _request);
         }
 
         [TestMethod]

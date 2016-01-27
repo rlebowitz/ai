@@ -12,14 +12,9 @@ namespace AIMLbot
     /// </summary>
     public class Result
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(Result));
+        private static readonly ILog Log = LogManager.GetLogger(typeof (Result));
 
         private readonly string[] _splitters;
-
-        /// <summary>
-        /// The ChatBot that is providing the answer
-        /// </summary>
-        public ChatBot ChatBot;
 
         /// <summary>
         /// The amount of time the request took to process
@@ -58,15 +53,13 @@ namespace AIMLbot
         public User User;
 
         /// <summary>
-        /// Ctor
+        /// Creates an instance of the Result class.
         /// </summary>
         /// <param name="user">The user for whom this is a result</param>
-        /// <param name="chatBot">The ChatBot providing the result</param>
         /// <param name="request">The request that originated this result</param>
-        public Result(User user, ChatBot chatBot, Request request)
+        public Result(User user, Request request)
         {
             User = user;
-            ChatBot = chatBot;
             Request = request;
             Request.Result = this;
             _splitters = ChatBot.Splitters.ToArray();

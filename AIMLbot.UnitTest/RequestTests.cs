@@ -15,13 +15,13 @@ namespace AIMLbot.UnitTest
         public void Setup()
         {
             _chatBot = new ChatBot();
-            _user = new User("1", _chatBot);
+            _user = new User();
         }
 
         [TestMethod]
         public void TestRequestConstructor()
         {
-            _request = new Request("This is a test", _user, _chatBot);
+            _request = new Request("This is a test", _user);
             Assert.AreEqual("This is a test", _request.RawInput);
         }
     }

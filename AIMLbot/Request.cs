@@ -10,11 +10,6 @@ namespace AIMLbot
         #region Attributes
 
         /// <summary>
-        /// The ChatBot to which the request is being made
-        /// </summary>
-        public ChatBot ChatBot;
-
-        /// <summary>
         /// Flag to show that the request has timed out
         /// </summary>
         public bool HasTimedOut = false;
@@ -46,12 +41,10 @@ namespace AIMLbot
         /// </summary>
         /// <param name="rawInput">The raw input from the user</param>
         /// <param name="user">The user who made the request</param>
-        /// <param name="chatBot">The ChatBot to which this is a request</param>
-        public Request(string rawInput, User user, ChatBot chatBot)
+        public Request(string rawInput, User user)
         {
-            this.RawInput = rawInput;
-            this.User = user;
-            this.ChatBot = chatBot;
+            RawInput = rawInput;
+            User = user;
             StartedOn = DateTime.Now;
         }
     }

@@ -19,10 +19,10 @@ namespace AIMLbot.UnitTest.TagTests
         public void Setup()
         {
             _chatBot = new ChatBot();
-            _user = new User("1", _chatBot);
-            _request = new Request("This is a test", _user, _chatBot);
+            _user = new User();
+            _request = new Request("This is a test", _user);
             _query = new SubQuery();
-            _result = new Result(_user, _chatBot, _request);
+            _result = new Result(_user, _request);
         }
 
         [TestMethod]

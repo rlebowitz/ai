@@ -9,14 +9,6 @@ namespace AIMLbot
     /// </summary>
     public class User
     {
-        #region Attributes
-
-        //ToDo: eliminate reference to the ChatBot; should be possible to get reference to static predicate collection.
-        /// <summary>
-        ///     The ChatBot this user is using
-        /// </summary>
-        public ChatBot ChatBot;
-
         /// <summary>
         ///     the predicates associated with this particular user
         /// </summary>
@@ -42,27 +34,28 @@ namespace AIMLbot
         /// </summary>
         public Result LastResult => _results.Count > 0 ? _results[0] : null;
 
-        #endregion
-
-        #region Methods
+        /// <summary>
+        /// Default constructor using a randomly generated Id.
+        /// </summary>
+        public User() : this(RandomStringGenerator.GetUniqueId())
+        {
+        }
 
         /// <summary>
-        ///     Ctor
+        ///  Creates an instance of the User class.
         /// </summary>
         /// <param name="userId">The GUID of the user</param>
-        /// <param name="chatBot">the ChatBot the user is connected to</param>
-        public User(string userId, ChatBot chatBot)
+        public User(string userId)
         {
             if (userId.Length > 0)
             {
                 UserId = userId;
-                ChatBot = chatBot;
                 Predicates = ChatBot.Predicates.Clone();
                 Predicates.Add("topic", "*");
             }
             else
             {
-                throw new Exception("The UserID cannot be empty");
+                throw new Exception("The UserId cannot be empty");
             }
         }
 
@@ -163,7 +156,5 @@ namespace AIMLbot
         {
             _results.Insert(0, latestResult);
         }
-
-        #endregion
     }
 }

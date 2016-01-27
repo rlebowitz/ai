@@ -44,16 +44,9 @@ namespace AIMLbot.UnitTest
 
 
         [TestMethod]
-        [ExpectedException(typeof(Exception))]
-        public void TestBadConstructor()
-        {
-            _user = new User("", _chatBot);
-        }
-
-        [TestMethod]
         public void TestConstructorPopulatesUserObject()
         {
-            _user = new User("1", _chatBot);
+            _user = new User("1");
             Assert.AreEqual("*", _user.Topic);
             Assert.AreEqual("1", _user.UserId);
             // the +1 in the following assert is the creation of the default topic predicate
@@ -65,16 +58,16 @@ namespace AIMLbot.UnitTest
         [TestMethod]
         public void TestResultHandlers()
         {
-            _user = new User("1", _chatBot);
+            _user = new User();
             Assert.AreEqual("", _user.GetResultSentence());
-            var mockRequest = new Request("Sentence 1. Sentence 2", _user, _chatBot);
-            var mockResult = new Result(_user, _chatBot, mockRequest);
+            var mockRequest = new Request("Sentence 1. Sentence 2", _user);
+            var mockResult = new Result(_user, mockRequest);
             mockResult.InputSentences.Add("Result 1");
             mockResult.InputSentences.Add("Result 2");
             mockResult.OutputSentences.Add("Result 1");
             mockResult.OutputSentences.Add("Result 2");
             _user.AddResult(mockResult);
-            var mockResult2 = new Result(_user, _chatBot, mockRequest);
+            var mockResult2 = new Result(_user, mockRequest);
             mockResult2.InputSentences.Add("Result 3");
             mockResult2.InputSentences.Add("Result 4");
             mockResult2.OutputSentences.Add("Result 3");
