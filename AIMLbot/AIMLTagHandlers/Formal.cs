@@ -1,4 +1,5 @@
-using System.Text;
+using System;
+using System.Globalization;
 using System.Xml;
 using AIMLbot.Utils;
 
@@ -36,24 +37,11 @@ namespace AIMLbot.AIMLTagHandlers
 
         protected override string ProcessChange()
         {
-            if (TemplateNode.Name.ToLower() == "formal")
+            if (!TemplateNode.Name.Equals("formal", StringComparison.CurrentCultureIgnoreCase)) return string.Empty;
+            if (TemplateNode.InnerText.Length > 0)
             {
-                StringBuilder result = new StringBuilder();
-                if (TemplateNode.InnerText.Length > 0)
-                {
-                    string[] words = TemplateNode.InnerText.ToLower().Split();
-                    foreach (string word in words)
-                    {
-                        string newWord = word.Substring(0, 1);
-                        newWord = newWord.ToUpper();
-                        if (word.Length > 1)
-                        {
-                            newWord += word.Substring(1);
-                        }
-                        result.Append(newWord + " ");
-                    }
-                }
-                return result.ToString().Trim();
+                var ti = CultureInfo.CurrentCulture.TextInfo;
+                return ti.ToTitleCase(TemplateNode.InnerText.ToLower());
             }
             return string.Empty;
         }

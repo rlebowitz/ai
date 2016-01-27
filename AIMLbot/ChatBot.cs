@@ -19,8 +19,7 @@ using Version = AIMLbot.AIMLTagHandlers.Version;
 namespace AIMLbot
 {
     /// <summary>
-    ///     Encapsulates a ChatBot. If no settings.xml file is found or referenced the ChatBot will try to
-    ///     default to safe settings.
+    /// A simple c# AIML Bot designed for use in desktop, web and embedded systems.
     /// </summary>
     public class ChatBot
     {
@@ -159,8 +158,7 @@ namespace AIMLbot
         ///     The directory to look in for the AIML files
         /// </summary>
         public string PathToAIML
-            => Path.Combine(Environment.CurrentDirectory, ConfigurationManager.AppSettings.Get("aimldirectory", "Aiml"))
-            ;
+            => Path.Combine(Environment.CurrentDirectory, ConfigurationManager.AppSettings.Get("aimldirectory", "AIML"));
 
         #endregion
 
