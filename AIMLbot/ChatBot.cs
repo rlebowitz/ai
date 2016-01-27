@@ -227,7 +227,8 @@ namespace AIMLbot
                 // grab the templates for the various sentences from the graphmaster
                 foreach (var path in result.NormalizedPaths)
                 {
-                    var query = new SubQuery(path);
+//                    var query = new SubQuery(path);
+                    var query = new SubQuery();
                     var searcher = new NodeSearcher(query, request);
                     query.Template = searcher.Evaluate(Graphmaster, path, MatchState.UserInput, new StringBuilder());
 //                        Graphmaster.Evaluate(path, query, request, MatchState.UserInput, new StringBuilder());

@@ -22,7 +22,7 @@ namespace AIMLbot.UnitTest.TagTests
             _user = new User("1", _chatBot);
             _request = new Request("This is a test", _user, _chatBot);
             _result = new Result(_user, _chatBot, _request);
-            _query = new SubQuery("This is a test <that> * <topic> *");
+            _query = new SubQuery();
         }
 
         [TestMethod]

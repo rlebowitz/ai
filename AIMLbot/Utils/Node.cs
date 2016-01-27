@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Xml;
-using log4net;
 
 namespace AIMLbot.Utils
 {
@@ -11,7 +10,6 @@ namespace AIMLbot.Utils
     [Serializable]
     public class Node
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof (Node));
 
         #region Add category
 

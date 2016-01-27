@@ -20,7 +20,7 @@ namespace AIMLbot.UnitTest.TagTests
             _chatBot = new ChatBot();
             _user = new User("1", _chatBot);
             _request = new Request("This is a test", _user, _chatBot);
-            _query = new SubQuery("This is a test <that> * <topic> *");
+            _query = new SubQuery();
             _query.InputStar.Insert(0, "first star");
             _query.InputStar.Insert(0, "second star");
             //this.mockResult = new Result(this._user, this._chatBot, this._request);

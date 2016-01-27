@@ -13,7 +13,7 @@ namespace AIMLbot.Utils
         /// <summary>
         /// The path that this query relates to
         /// </summary>
-        public string FullPath { get; set; }
+//        public string FullPath { get; set; }
 
         /// <summary>
         /// If the raw input matches a wildcard then this attribute will contain the block of 
@@ -44,9 +44,9 @@ namespace AIMLbot.Utils
         /// Ctor
         /// </summary>
         /// <param name="fullPath">The path that this query relates to</param>
-        public SubQuery(string fullPath)
+        public SubQuery()
         {
-            FullPath = fullPath;
+//            FullPath = fullPath;
         }
     }
 }
