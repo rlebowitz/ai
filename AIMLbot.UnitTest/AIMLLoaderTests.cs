@@ -9,8 +9,6 @@ namespace AIMLbot.UnitTest
     [TestClass]
     public class AIMLLoaderTests
     {
-        private ChatBot _chatBot;
-
         private AIMLLoader _loader;
 
         //http://imaso.googlecode.com/svn/trunk/200811-Aiml/Tests/Tests/Settings/aiml/
@@ -23,8 +21,7 @@ namespace AIMLbot.UnitTest
         [TestMethod]
         public void TestGeneratePathWorksAsUserInput()
         {
-            _chatBot = new ChatBot();
-            _loader = new AIMLLoader(_chatBot);
+            _loader = new AIMLLoader();
             var result =
                 _loader.GeneratePath("This * is _ a pattern", "This * is _ a that", "This * is _ a topic", true);
             var expected = "This is a pattern <that> This is a that <topic> This is a topic";
@@ -37,8 +34,7 @@ namespace AIMLbot.UnitTest
             const string path = @"AIML\TestThat.aiml";
             var element = XDocument.Load(path);
             var aiml = element.Descendants("aiml").FirstOrDefault();
-            _chatBot = new ChatBot();
-            _loader = new AIMLLoader(_chatBot);
+            _loader = new AIMLLoader();
             var result = _loader.GeneratePath(aiml, "testing topic 123", false);
             var expected = "test 1 <that> testing that 123 <topic> testing topic 123";
             Assert.AreEqual(expected, result);
@@ -50,8 +46,7 @@ namespace AIMLbot.UnitTest
             var path = @"AIML\TestWildcards.aiml";
             var doc = XDocument.Load(path);
             var aiml = doc.Descendants("aiml").FirstOrDefault();
-            _chatBot = new ChatBot();
-            _loader = new AIMLLoader(_chatBot);
+            _loader = new AIMLLoader();
             var result = _loader.GeneratePath(aiml, "testing _ 123 *", false);
             var expected = "test * 1 _ <that> testing * that _ 123 <topic> testing _ 123 *";
             Assert.AreEqual(expected, result);
@@ -63,8 +58,7 @@ namespace AIMLbot.UnitTest
             var path = @"AIML\TestNoThat.aiml";
             var doc = XDocument.Load(path);
             var aiml = doc.Descendants("aiml").FirstOrDefault();
-            _chatBot = new ChatBot();
-            _loader = new AIMLLoader(_chatBot);
+            _loader = new AIMLLoader();
             var result = _loader.GeneratePath(aiml, "*", false);
             var expected = "test 1 <that> * <topic> *";
             Assert.AreEqual(expected, result);
@@ -75,8 +69,7 @@ namespace AIMLbot.UnitTest
         public void TestLoadAIMLFileWithBadXML()
         {
             var path = @"AIML\BadlyFormed.aiml";
-            _chatBot = new ChatBot();
-            _loader = new AIMLLoader(_chatBot);
+            _loader = new AIMLLoader();
             _loader.LoadAIML(path);
         }
 
@@ -85,8 +78,7 @@ namespace AIMLbot.UnitTest
         public void TestLoadAIMLFileWithValidXMLButMissingPattern()
         {
             var path = @"AIML\MissingPattern.aiml";
-            _chatBot = new ChatBot();
-            _loader = new AIMLLoader(_chatBot);
+            _loader = new AIMLLoader();
             _loader.LoadAIML(path);
         }
 
@@ -95,9 +87,8 @@ namespace AIMLbot.UnitTest
         public void TestLoadAIMLFileWithValidXMLButMissingTemplate()
         {
             var path = @"AIML\MissingPattern.aiml";
-                _chatBot = new ChatBot();
-                _loader = new AIMLLoader(_chatBot);
-                _loader.LoadAIML(path);
+            _loader = new AIMLLoader();
+            _loader.LoadAIML(path);
         }
     }
 }

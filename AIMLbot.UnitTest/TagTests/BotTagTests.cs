@@ -1,6 +1,5 @@
 using System.Xml;
 using AIMLbot.AIMLTagHandlers;
-using AIMLbot.Utils;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AIMLbot.UnitTest.TagTests
@@ -8,53 +7,43 @@ namespace AIMLbot.UnitTest.TagTests
     [TestClass]
     public class BotTagTests
     {
-        private ChatBot _chatBot;
-        private User _user;
-        private Request _request;
-        private Result _result;
-        private SubQuery _query;
         private Bot _botTagHandler;
 
         [TestInitialize]
         public void Setup()
         {
-            _chatBot = new ChatBot();
-            _user = new User();
-            _request = new Request("This is a test", _user);
-            _query = new SubQuery();
-            _result = new Result(_user, _request);
         }
 
         [TestMethod]
         public void TestBadAttribute()
         {
             XmlNode testNode = StaticHelpers.GetNode("<bot value=\"name\"/>");
-            _botTagHandler = new Bot(_chatBot, _user, _query, _request, _result, testNode);
-            Assert.AreEqual("", _botTagHandler.Transform());
+            _botTagHandler = new Bot(testNode);
+            Assert.AreEqual("", _botTagHandler.ProcessChange());
         }
 
         [TestMethod]
         public void TestBadNodeName()
         {
             XmlNode testNode = StaticHelpers.GetNode("<bad value=\"name\"/>");
-            _botTagHandler = new Bot(_chatBot, _user, _query, _request, _result, testNode);
-            Assert.AreEqual("", _botTagHandler.Transform());
+            _botTagHandler = new Bot(testNode);
+            Assert.AreEqual("", _botTagHandler.ProcessChange());
         }
 
         [TestMethod]
         public void TestExpectedInput()
         {
             XmlNode testNode = StaticHelpers.GetNode("<bot name= \"name\"/>");
-            _botTagHandler = new Bot(_chatBot, _user, _query, _request, _result, testNode);
-            Assert.AreEqual("un-named user", _botTagHandler.Transform());
+            _botTagHandler = new Bot(testNode);
+            Assert.AreEqual("un-named user", _botTagHandler.ProcessChange());
         }
 
         [TestMethod]
         public void TestNonExistentPredicate()
         {
             XmlNode testNode = StaticHelpers.GetNode("<bot name=\"nonexistent\"/>");
-            _botTagHandler = new Bot(_chatBot, _user, _query, _request, _result, testNode);
-            Assert.AreEqual("", _botTagHandler.Transform());
+            _botTagHandler = new Bot(testNode);
+            Assert.AreEqual("", _botTagHandler.ProcessChange());
         }
 
         [TestMethod]
@@ -70,8 +59,8 @@ namespace AIMLbot.UnitTest.TagTests
             {
                 var tag = $"<bot name=\"{predicate}\" />";
                 var testNode = StaticHelpers.GetNode(tag);
-                _botTagHandler = new Bot(_chatBot, _user, _query, _request, _result, testNode);
-                var transform =_botTagHandler.Transform();
+                _botTagHandler = new Bot(testNode);
+                var transform =_botTagHandler.ProcessChange();
                 Assert.AreNotEqual(string.Empty, transform);
             }
         }
@@ -80,8 +69,8 @@ namespace AIMLbot.UnitTest.TagTests
         public void TestTooManyAttributes()
         {
             XmlNode testNode = StaticHelpers.GetNode("<bot name=\"name\" value=\"bad\"/>");
-            _botTagHandler = new Bot(_chatBot, _user, _query, _request, _result, testNode);
-            Assert.AreEqual("", _botTagHandler.Transform());
+            _botTagHandler = new Bot(testNode);
+            Assert.AreEqual("", _botTagHandler.ProcessChange());
         }
     }
 }

@@ -29,7 +29,7 @@ namespace AIMLbot.UnitTest.TagTests
         {
             var testNode = StaticHelpers.GetNode("<formal/>");
             _botTagHandler = new Formal(testNode);
-            Assert.AreEqual("", _botTagHandler.Transform());
+            Assert.AreEqual("", _botTagHandler.ProcessChange());
         }
 
         [TestMethod]
@@ -37,7 +37,7 @@ namespace AIMLbot.UnitTest.TagTests
         {
             var testNode = StaticHelpers.GetNode("<formal>THIS IS A TEST</formal>");
             _botTagHandler = new Formal(testNode);
-            Assert.AreEqual("This Is A Test", _botTagHandler.Transform());
+            Assert.AreEqual("This Is A Test", _botTagHandler.ProcessChange());
         }
 
         [TestMethod]
@@ -45,7 +45,7 @@ namespace AIMLbot.UnitTest.TagTests
         {
             var testNode = StaticHelpers.GetNode("<formal>this is a test</formal>");
             _botTagHandler = new Formal(testNode);
-            Assert.AreEqual("This Is A Test", _botTagHandler.Transform());
+            Assert.AreEqual("This Is A Test", _botTagHandler.ProcessChange());
         }
     }
 }

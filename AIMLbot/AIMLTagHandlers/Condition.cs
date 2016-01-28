@@ -90,54 +90,47 @@ namespace AIMLbot.AIMLTagHandlers
     /// AIML predicate, and a required attribute value, which contains a simple pattern expression. The 
     /// element may contain any AIML template elements. 
     /// </summary>
-    public class Condition : IAIMLTagHandler
+    public class Condition : AIMLTagHandler
     {
         /// <summary>
         /// Primary constructor
         /// </summary>
-        /// <param name="chatBot">The ChatBot involved in this request</param>
         /// <param name="user">The user making the request</param>
-        /// <param name="query">The query that originated this node</param>
-        /// <param name="request">The request inputted into the system</param>
-        /// <param name="result">The result to be passed to the user</param>
-        /// <param name="templateNode">The node to be processed</param>
-        public Condition(ChatBot chatBot,
-                         User user,
-                         SubQuery query,
-                         Request request,
-                         Result result,
-                         XmlNode templateNode)
-            : base(chatBot, user, query, request, result, templateNode)
+        /// <param name="template">The node to be processed</param>
+        public Condition(User user, XmlNode template) : base(template)
         {
+            User = user;
             IsRecursive = false;
         }
 
-        protected override string ProcessChange()
+        public User User { get; set; }
+
+        public override string ProcessChange()
         {
-            if (TemplateNode.Name.ToLower() != "condition") return string.Empty;
+            if (Template.Name.ToLower() != "condition") return string.Empty;
             // heuristically work out the type of condition being processed
 
-            if (TemplateNode.Attributes != null && TemplateNode.Attributes.Count == 2) // block
+            if (Template.Attributes != null && Template.Attributes.Count == 2) // block
             {
                 string name = "";
                 string value = "";
 
-                if (TemplateNode.Attributes[0].Name == "name")
+                if (Template.Attributes[0].Name == "name")
                 {
-                    name = TemplateNode.Attributes[0].Value;
+                    name = Template.Attributes[0].Value;
                 }
-                else if (TemplateNode.Attributes[0].Name == "value")
+                else if (Template.Attributes[0].Name == "value")
                 {
-                    value = TemplateNode.Attributes[0].Value;
+                    value = Template.Attributes[0].Value;
                 }
 
-                if (TemplateNode.Attributes[1].Name == "name")
+                if (Template.Attributes[1].Name == "name")
                 {
-                    name = TemplateNode.Attributes[1].Value;
+                    name = Template.Attributes[1].Value;
                 }
-                else if (TemplateNode.Attributes[1].Name == "value")
+                else if (Template.Attributes[1].Name == "value")
                 {
-                    value = TemplateNode.Attributes[1].Value;
+                    value = Template.Attributes[1].Value;
                 }
 
                 if ((name.Length > 0) & (value.Length > 0))
@@ -147,16 +140,16 @@ namespace AIMLbot.AIMLTagHandlers
                         new Regex(value.Replace(" ", "\\s").Replace("*", "[\\sA-Z0-9]+"), RegexOptions.IgnoreCase);
                     if (matcher.IsMatch(actualValue))
                     {
-                        return TemplateNode.InnerXml;
+                        return Template.InnerXml;
                     }
                 }
             }
-            else if (TemplateNode.Attributes != null && TemplateNode.Attributes.Count == 1) // single predicate
+            else if (Template.Attributes != null && Template.Attributes.Count == 1) // single predicate
             {
-                if (TemplateNode.Attributes[0].Name == "name")
+                if (Template.Attributes[0].Name == "name")
                 {
-                    string name = TemplateNode.Attributes[0].Value;
-                    foreach (XmlNode childLiNode in TemplateNode.ChildNodes)
+                    string name = Template.Attributes[0].Value;
+                    foreach (XmlNode childLiNode in Template.ChildNodes)
                     {
                         if (childLiNode.Name.ToLower() == "li")
                         {
@@ -184,9 +177,9 @@ namespace AIMLbot.AIMLTagHandlers
                     }
                 }
             }
-            else if (TemplateNode.Attributes != null && TemplateNode.Attributes.Count == 0) // multi-predicate
+            else if (Template.Attributes != null && Template.Attributes.Count == 0) // multi-predicate
             {
-                foreach (XmlNode childLiNode in TemplateNode.ChildNodes)
+                foreach (XmlNode childLiNode in Template.ChildNodes)
                 {
                     if (childLiNode.Name.ToLower() == "li")
                     {

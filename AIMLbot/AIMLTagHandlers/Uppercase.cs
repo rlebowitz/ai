@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Xml;
 using AIMLbot.Utils;
 
@@ -11,32 +12,21 @@ namespace AIMLbot.AIMLTagHandlers
     /// If no character in this string has a different uppercase version, based on the Unicode 
     /// standard, then the original string is returned. 
     /// </summary>
-    public class Uppercase : IAIMLTagHandler
+    public class Uppercase : AIMLTagHandler
     {
         /// <summary>
         /// Ctor
         /// </summary>
-        /// <param name="chatBot">The ChatBot involved in this request</param>
-        /// <param name="user">The user making the request</param>
-        /// <param name="query">The query that originated this node</param>
-        /// <param name="request">The request inputted into the system</param>
-        /// <param name="result">The result to be passed to the user</param>
-        /// <param name="templateNode">The node to be processed</param>
-        public Uppercase(ChatBot chatBot,
-                         User user,
-                         SubQuery query,
-                         Request request,
-                         Result result,
-                         XmlNode templateNode)
-            : base(chatBot, user, query, request, result, templateNode)
+        /// <param name="template">The node to be processed</param>
+        public Uppercase(XmlNode template) : base(template)
         {
         }
 
-        protected override string ProcessChange()
+        public override string ProcessChange()
         {
-            if (TemplateNode.Name.ToLower() == "uppercase")
+            if (Template.Name.ToLower() == "uppercase")
             {
-                return TemplateNode.InnerText.ToUpper(ChatBot.Locale);
+                return Template.InnerText.ToUpper(CultureInfo.CurrentCulture);
             }
             return string.Empty;
         }

@@ -20,7 +20,7 @@ namespace AIMLbot.UnitTest.TagTests
         {
             var testNode = StaticHelpers.GetNode("<dote/>");
             _dateTagHandler = new Date(testNode);
-            Assert.AreEqual("", _dateTagHandler.Transform());
+            Assert.AreEqual("", _dateTagHandler.ProcessChange());
         }
 
         [TestMethod]
@@ -30,7 +30,7 @@ namespace AIMLbot.UnitTest.TagTests
             _dateTagHandler = new Date(testNode);
             var now = DateTime.Now;
             var expected = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
-            Assert.AreEqual(expected.ToString(CultureInfo.CurrentCulture), _dateTagHandler.Transform());
+            Assert.AreEqual(expected.ToString(CultureInfo.CurrentCulture), _dateTagHandler.ProcessChange());
         }
     }
 }

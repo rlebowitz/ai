@@ -18,33 +18,30 @@ namespace AIMLbot.AIMLTagHandlers
     /// 
     /// The thatstar element does not have any content. 
     /// </summary>
-    public class ThatStar : IAIMLTagHandler
+    public class ThatStar : AIMLTagHandler
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ThatStar));
+        private static readonly ILog Log = LogManager.GetLogger(typeof (ThatStar));
 
         /// <summary>
         /// Ctor
         /// </summary>
-        /// <param name="chatBot">The ChatBot involved in this request</param>
-        /// <param name="user">The user making the request</param>
         /// <param name="query">The query that originated this node</param>
         /// <param name="request">The request inputted into the system</param>
-        /// <param name="result">The result to be passed to the user</param>
-        /// <param name="templateNode">The node to be processed</param>
-        public ThatStar(ChatBot chatBot,
-                        User user,
-                        SubQuery query,
-                        Request request,
-                        Result result,
-                        XmlNode templateNode)
-            : base(chatBot, user, query, request, result, templateNode)
+        /// <param name="template">The node to be processed</param>
+        public ThatStar(SubQuery query, Request request, XmlNode template)
+            : base(template)
         {
+            Query = query;
+            Request = request;
         }
 
-        protected override string ProcessChange()
+        public SubQuery Query { get; set; }
+        public Request Request { get; set; }
+
+        public override string ProcessChange()
         {
-            if (TemplateNode.Name.ToLower() != "thatstar") return string.Empty;
-            if (TemplateNode.Attributes != null && TemplateNode.Attributes.Count == 0)
+            if (Template.Name.ToLower() != "thatstar") return string.Empty;
+            if (Template.Attributes != null && Template.Attributes.Count == 0)
             {
                 if (Query.ThatStar.Count > 0)
                 {
@@ -57,13 +54,13 @@ namespace AIMLbot.AIMLTagHandlers
                         Request.RawInput);
                 }
             }
-            else if (TemplateNode.Attributes != null && TemplateNode.Attributes.Count == 1)
+            else if (Template.Attributes != null && Template.Attributes.Count == 1)
             {
-                if (TemplateNode.Attributes[0].Name.ToLower() != "index") return string.Empty;
-                if (TemplateNode.Attributes[0].Value.Length <= 0) return string.Empty;
+                if (Template.Attributes[0].Name.ToLower() != "index") return string.Empty;
+                if (Template.Attributes[0].Value.Length <= 0) return string.Empty;
                 try
                 {
-                    int result = Convert.ToInt32(TemplateNode.Attributes[0].Value.Trim());
+                    int result = Convert.ToInt32(Template.Attributes[0].Value.Trim());
                     if (Query.ThatStar.Count > 0)
                     {
                         if (result > 0)
@@ -71,7 +68,7 @@ namespace AIMLbot.AIMLTagHandlers
                             return Query.ThatStar[result - 1];
                         }
                         Log.Error("ERROR! An input tag with a bady formed index (" +
-                                  TemplateNode.Attributes[0].Value +
+                                  Template.Attributes[0].Value +
                                   ") was encountered processing the input: " + Request.RawInput);
                     }
                     else
@@ -84,7 +81,7 @@ namespace AIMLbot.AIMLTagHandlers
                 catch
                 {
                     Log.Error("ERROR! A thatstar tag with a bady formed index (" +
-                              TemplateNode.Attributes[0].Value +
+                              Template.Attributes[0].Value +
                               ") was encountered processing the input: " + Request.RawInput);
                 }
             }

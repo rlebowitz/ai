@@ -18,23 +18,10 @@ namespace AIMLbot.Utils
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof (AIMLLoader));
 
-        #region Attributes
-
-        /// <summary>
-        ///     The ChatBot whose brain is being processed
-        /// </summary>
-        private readonly ChatBot _chatBot;
-
-        #endregion
 
         /// <summary>
         ///     Ctor
         /// </summary>
-        /// <param name="chatBot">The ChatBot whose brain is being processed</param>
-        public AIMLLoader(ChatBot chatBot)
-        {
-            _chatBot = chatBot;
-        }
 
         #region Methods
 
@@ -179,8 +166,8 @@ namespace AIMLbot.Utils
             {
                 try
                 {
-                    _chatBot.Graphmaster.AddCategory(categoryPath, template.ToString());
-                    _chatBot.Size++;
+                    ChatBot.Graphmaster.AddCategory(categoryPath, template.ToString());
+                    ChatBot.Size++;
                 }
                 catch
                 {
@@ -238,7 +225,7 @@ namespace AIMLbot.Utils
             string normalizedThat;
             string normalizedTopic;
 
-            if (_chatBot.TrustAIML & !isUserInput)
+            if (ChatBot.TrustAIML & !isUserInput)
             {
                 normalizedPattern = pattern.Trim();
                 normalizedThat = that.Trim();
@@ -265,7 +252,7 @@ namespace AIMLbot.Utils
 
                 // This check is in place to avoid huge "that" elements having to be processed by the 
                 // graphmaster. 
-                if (normalizedThat.Length > _chatBot.MaxThatSize)
+                if (normalizedThat.Length > ChatBot.MaxThatSize)
                 {
                     normalizedThat = "*";
                 }

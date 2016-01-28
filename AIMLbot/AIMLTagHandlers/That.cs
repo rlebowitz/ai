@@ -23,43 +23,40 @@ namespace AIMLbot.AIMLTagHandlers
     /// 
     /// The template-side that element does not have any content. 
     /// </summary>
-    public class That : IAIMLTagHandler
+    public class That : AIMLTagHandler
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(That));
+        private static readonly ILog Log = LogManager.GetLogger(typeof (That));
 
         /// <summary>
         /// Ctor
         /// </summary>
-        /// <param name="chatBot">The ChatBot involved in this request</param>
         /// <param name="user">The user making the request</param>
-        /// <param name="query">The query that originated this node</param>
         /// <param name="request">The request inputted into the system</param>
-        /// <param name="result">The result to be passed to the user</param>
-        /// <param name="templateNode">The node to be processed</param>
-        public That(ChatBot chatBot,
-                    User user,
-                    SubQuery query,
-                    Request request,
-                    Result result,
-                    XmlNode templateNode)
-            : base(chatBot, user, query, request, result, templateNode)
+        /// <param name="template">The node to be processed</param>
+        public That(User user, Request request, XmlNode template) : base(template)
         {
+            User = user;
+            Request = request;
         }
 
-        protected override string ProcessChange()
+        public User User { get; set; }
+
+        public Request Request { get; set; }
+
+        public override string ProcessChange()
         {
-            if (TemplateNode.Name.ToLower() != "that") return string.Empty;
-            if (TemplateNode.Attributes != null && TemplateNode.Attributes.Count == 0)
+            if (Template.Name.ToLower() != "that") return string.Empty;
+            if (Template.Attributes != null && Template.Attributes.Count == 0)
             {
                 return User.GetThat();
             }
-            if (TemplateNode.Attributes == null || TemplateNode.Attributes.Count != 1) return string.Empty;
-            if (TemplateNode.Attributes[0].Name.ToLower() != "index") return string.Empty;
-            if (TemplateNode.Attributes[0].Value.Length <= 0) return string.Empty;
+            if (Template.Attributes == null || Template.Attributes.Count != 1) return string.Empty;
+            if (Template.Attributes[0].Name.ToLower() != "index") return string.Empty;
+            if (Template.Attributes[0].Value.Length <= 0) return string.Empty;
             try
             {
                 // see if there is a split
-                string[] dimensions = TemplateNode.Attributes[0].Value.Split(",".ToCharArray());
+                string[] dimensions = Template.Attributes[0].Value.Split(",".ToCharArray());
                 if (dimensions.Length == 2)
                 {
                     int result = Convert.ToInt32(dimensions[0].Trim());
@@ -71,26 +68,26 @@ namespace AIMLbot.AIMLTagHandlers
                     else
                     {
                         Log.Error("ERROR! An input tag with a bady formed index (" +
-                                  TemplateNode.Attributes[0].Value +
+                                  Template.Attributes[0].Value +
                                   ") was encountered processing the input: " + Request.RawInput);
                     }
                 }
                 else
                 {
-                    int result = Convert.ToInt32(TemplateNode.Attributes[0].Value.Trim());
+                    int result = Convert.ToInt32(Template.Attributes[0].Value.Trim());
                     if (result > 0)
                     {
                         return User.GetThat(result - 1);
                     }
                     Log.Error("ERROR! An input tag with a bady formed index (" +
-                              TemplateNode.Attributes[0].Value +
+                              Template.Attributes[0].Value +
                               ") was encountered processing the input: " + Request.RawInput);
                 }
             }
             catch
             {
                 Log.Error("ERROR! An input tag with a bady formed index (" +
-                          TemplateNode.Attributes[0].Value +
+                          Template.Attributes[0].Value +
                           ") was encountered processing the input: " + Request.RawInput);
             }
             return string.Empty;

@@ -158,7 +158,8 @@ namespace AIMLbot
         ///     The directory to look in for the AIML files
         /// </summary>
         public string PathToAIML
-            => Path.Combine(Environment.CurrentDirectory, ConfigurationManager.AppSettings.Get("aimldirectory", "AIML"));
+            => Path.Combine(Environment.CurrentDirectory, ConfigurationManager.AppSettings.Get("aimldirectory", "AIML"))
+            ;
 
         #endregion
 
@@ -169,13 +170,13 @@ namespace AIMLbot
         /// </summary>
         public void LoadAIML()
         {
-            var loader = new AIMLLoader(this);
+            var loader = new AIMLLoader();
             loader.LoadAIML();
         }
 
         public void LoadAIML(string path)
         {
-            var loader = new AIMLLoader(this);
+            var loader = new AIMLLoader();
             loader.LoadAIML(path);
         }
 
@@ -185,7 +186,7 @@ namespace AIMLbot
         /// <param name="newAIML">The XML document containing the AIML</param>
         public void LoadAIML(XDocument newAIML)
         {
-            var loader = new AIMLLoader(this);
+            var loader = new AIMLLoader();
             loader.LoadAIML(newAIML);
         }
 
@@ -228,7 +229,7 @@ namespace AIMLbot
             if (IsAcceptingUserInput)
             {
                 // Normalize the input
-                var loader = new AIMLLoader(this);
+                var loader = new AIMLLoader();
                 var rawSentences = request.RawInput.SplitStrings();
                 foreach (var sentence in rawSentences)
                 {
@@ -314,14 +315,14 @@ namespace AIMLbot
                 }
                 return templateResult.ToString();
             }
-            IAIMLTagHandler tagHandler = null;
+            AIMLTagHandler tagHandler = null;
             switch (tagName)
             {
                 case "bot":
-                    tagHandler = new Bot(this, user, query, request, result, node);
+                    tagHandler = new Bot(node);
                     break;
                 case "condition":
-                    tagHandler = new Condition(this, user, query, request, result, node);
+                    tagHandler = new Condition(user, node);
                     break;
                 case "date":
                     tagHandler = new Date(node);
@@ -381,25 +382,25 @@ namespace AIMLbot
                     tagHandler = new Star(query, request, node);
                     break;
                 case "system":
-                    tagHandler = new SystemTag(this, user, query, request, result, node);
+                    tagHandler = new SystemTag(node);
                     break;
                 case "that":
-                    tagHandler = new That(this, user, query, request, result, node);
+                    tagHandler = new That(user, request, node);
                     break;
                 case "thatstar":
-                    tagHandler = new ThatStar(this, user, query, request, result, node);
+                    tagHandler = new ThatStar(query, request, node);
                     break;
                 case "think":
-                    tagHandler = new Think(this, user, query, request, result, node);
+                    tagHandler = new Think(node);
                     break;
                 case "topicstar":
-                    tagHandler = new Topicstar(this, user, query, request, result, node);
+                    tagHandler = new Topicstar(query, request, node);
                     break;
                 case "uppercase":
-                    tagHandler = new Uppercase(this, user, query, request, result, node);
+                    tagHandler = new Uppercase(node);
                     break;
                 case "version":
-                    tagHandler = new Version(this, user, query, request, result, node);
+                    tagHandler = new Version(node);
                     break;
                 default:
                     Log.ErrorFormat("Unknown AIML tag: {0}", tagName);
@@ -422,10 +423,10 @@ namespace AIMLbot
                         }
                     }
                 }
-                return tagHandler.Transform();
+                return tagHandler.ProcessChange();
             }
-            var resultNodeInnerXML = tagHandler.Transform();
-            var resultNode = IAIMLTagHandler.GetNode("<node>" + resultNodeInnerXML + "</node>");
+            var resultNodeInnerXML = tagHandler.ProcessChange();
+            var resultNode = AIMLTagHandler.GetNode("<node>" + resultNodeInnerXML + "</node>");
             if (resultNode.HasChildNodes)
             {
                 var recursiveResult = new StringBuilder();

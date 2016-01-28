@@ -1,6 +1,5 @@
 using System.Xml;
 using AIMLbot.AIMLTagHandlers;
-using AIMLbot.Utils;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AIMLbot.UnitTest.TagTests
@@ -8,37 +7,29 @@ namespace AIMLbot.UnitTest.TagTests
     [TestClass]
     public class IdTagTests
     {
-        private ChatBot _chatBot;
         private User _user;
-        private Request _request;
-        private Result _result;
-        private SubQuery _query;
-        private Id _botTagHandler;
+        private Id _idTagHandler;
 
         [TestInitialize]
         public void Setup()
         {
-            _chatBot = new ChatBot();
             _user = new User();
-            _request = new Request("This is a test", _user);
-            _query = new SubQuery();
-            _result = new Result(_user, _request);
         }
 
         [TestMethod]
         public void TestWithBadXml()
         {
             XmlNode testNode = StaticHelpers.GetNode("<od/>");
-            _botTagHandler = new Id(_chatBot, _user, _query, _request, _result, testNode);
-            Assert.AreEqual("", _botTagHandler.Transform());
+            _idTagHandler = new Id(_user, testNode);
+            Assert.AreEqual("", _idTagHandler.ProcessChange());
         }
 
         [TestMethod]
         public void TestWithValidData()
         {
             XmlNode testNode = StaticHelpers.GetNode("<id/>");
-            _botTagHandler = new Id(_chatBot, _user, _query, _request, _result, testNode);
-            Assert.AreEqual("1", _botTagHandler.Transform());
+            _idTagHandler = new Id(_user, testNode);
+            Assert.AreEqual("1", _idTagHandler.ProcessChange());
         }
     }
 }
