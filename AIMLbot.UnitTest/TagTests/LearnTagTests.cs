@@ -31,27 +31,27 @@ namespace AIMLbot.UnitTest.TagTests
         [TestMethod]
         public void TestWithBadInput()
         {
-            Assert.AreEqual(0, _chatBot.Size);
+            Assert.AreEqual(0, ChatBot.Size);
             XmlNode testNode = StaticHelpers.GetNode("<learn>./nonexistent/Salutations.aiml</learn>");
-            _botTagHandler = new Learn(_chatBot, _user, _query, _request, _result, testNode);
-            Assert.AreEqual("", _botTagHandler.Transform());
-            Assert.AreEqual(0, _chatBot.Size);
+            _botTagHandler = new Learn(testNode);
+            Assert.AreEqual("", _botTagHandler.ProcessChange());
+            Assert.AreEqual(0, ChatBot.Size);
         }
 
         [TestMethod]
         public void TestWithEmptyInput()
         {
-            Assert.AreEqual(0, _chatBot.Size);
+            Assert.AreEqual(0, ChatBot.Size);
             XmlNode testNode = StaticHelpers.GetNode("<learn/>");
-            _botTagHandler = new Learn(_chatBot, _user, _query, _request, _result, testNode);
-            Assert.AreEqual("", _botTagHandler.Transform());
-            Assert.AreEqual(0, _chatBot.Size);
+            _botTagHandler = new Learn(testNode);
+            Assert.AreEqual("", _botTagHandler.ProcessChange());
+            Assert.AreEqual(0, ChatBot.Size);
         }
 
         [TestMethod]
         public void TestWithValidInput()
         {
-            Assert.AreEqual(0, _chatBot.Size);
+            Assert.AreEqual(0, ChatBot.Size);
             var path = Environment.CurrentDirectory + @"\AIML\Salutations.aiml";
             XmlNode testNode = StaticHelpers.GetNode($"<learn>{path}</learn>");
             _botTagHandler = new Learn(_chatBot, _user, _query, _request, _result, testNode);
