@@ -18,7 +18,7 @@ namespace AIMLbot.AIMLTagHandlers
     /// 
     /// The thatstar element does not have any content. 
     /// </summary>
-    public class ThatStar : AIMLTagHandler
+    public class ThatStar : IAIMLTagHandler
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(ThatStar));
 

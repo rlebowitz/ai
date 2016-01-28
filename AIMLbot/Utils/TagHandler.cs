@@ -29,13 +29,13 @@ namespace AIMLbot.Utils
         /// </summary>
         /// <param name="assemblies">All the assemblies the ChatBot knows about</param>
         /// <returns>The instantiated class</returns>
-        public AIMLTagHandler Instantiate(Dictionary<string, Assembly> assemblies)
+        public IAIMLTagHandler Instantiate(Dictionary<string, Assembly> assemblies)
         {
             if (assemblies.ContainsKey(AssemblyName))
             {
                 Assembly tagDLL = (Assembly) assemblies[AssemblyName];
                 Type[] tagDLLTypes = tagDLL.GetTypes();
-                return (AIMLTagHandler) tagDLL.CreateInstance(ClassName);
+                return (IAIMLTagHandler) tagDLL.CreateInstance(ClassName);
             }
             else
             {

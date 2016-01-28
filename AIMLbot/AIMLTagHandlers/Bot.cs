@@ -15,7 +15,7 @@ namespace AIMLbot.AIMLTagHandlers
     /// 
     /// The ChatBot element does not have any content. 
     /// </summary>
-    public class Bot : AIMLTagHandler
+    public class Bot : IAIMLTagHandler
     {
         /// <summary>
         /// Ctor

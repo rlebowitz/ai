@@ -35,12 +35,12 @@ namespace AIMLbot
         /// <summary>
         ///     The "brain" of the ChatBot
         /// </summary>
-        public Node Graphmaster;
+        public static Node Graphmaster;
 
         /// <summary>
         ///     Flag to show if the ChatBot is willing to accept user input
         /// </summary>
-        public bool IsAcceptingUserInput { get; set; } = true;
+        public static bool IsAcceptingUserInput { get; set; } = true;
 
         /// <summary>
         ///     The maximum number of characters a "that" element of a path is allowed to be. Anything above
@@ -48,7 +48,7 @@ namespace AIMLbot
         ///     huge "that" elements in the path that might have been caused by the ChatBot reporting third party
         ///     data.
         /// </summary>
-        public int MaxThatSize = 256;
+        public static int MaxThatSize = 256;
 
         public static Dictionary<string, string> Genders =
             ConfigurationManager.GetSection("Gender") as Dictionary<string, string>;
@@ -71,7 +71,7 @@ namespace AIMLbot
         /// <summary>
         ///     The number of categories this ChatBot has in its graphmaster "brain"
         /// </summary>
-        public int Size;
+        public static int Size;
 
         /// <summary>
         ///     A List containing the tokens used to split the input into sentences during the
@@ -82,7 +82,7 @@ namespace AIMLbot
         /// <summary>
         ///     When the ChatBot was initialised
         /// </summary>
-        public DateTime StartedOn = DateTime.Now;
+        public static DateTime StartedOn = DateTime.Now;
 
         /// <summary>
         ///     Generic substitutions that take place during the normalization process
@@ -94,7 +94,7 @@ namespace AIMLbot
         ///     If set to false the input from AIML files will undergo the same normalization process that
         ///     user input goes through. If true the ChatBot will assume the AIML is correct. Defaults to true.
         /// </summary>
-        public bool TrustAIML = true;
+        public static bool TrustAIML = true;
 
         /// <summary>
         ///     The message to show if a user tries to use the ChatBot whilst it is set to not process user input
@@ -121,18 +121,18 @@ namespace AIMLbot
         /// <summary>
         ///     Will match all the illegal characters that might be inputted by the user
         /// </summary>
-        public Regex Strippers = ConfigurationManager.AppSettings.Get("stripperregex",
+        public static Regex Strippers = ConfigurationManager.AppSettings.Get("stripperregex",
             new Regex("[^0-9a-zA-Z]", RegexOptions.IgnorePatternWhitespace));
 
         /// <summary>
         ///     Flag to denote if the ChatBot is writing messages to its logs
         /// </summary>
-        public bool IsLogging = ConfigurationManager.AppSettings.Get("islogging", false);
+        public static bool IsLogging = ConfigurationManager.AppSettings.Get("islogging", false);
 
         /// <summary>
         ///     The supposed sex of the ChatBot
         /// </summary>
-        public Gender Sex
+        public static Gender Sex
         {
             get
             {
@@ -314,7 +314,7 @@ namespace AIMLbot
                 }
                 return templateResult.ToString();
             }
-            AIMLTagHandler tagHandler = null;
+            IAIMLTagHandler tagHandler = null;
             switch (tagName)
             {
                 case "bot":
@@ -324,61 +324,61 @@ namespace AIMLbot
                     tagHandler = new Condition(this, user, query, request, result, node);
                     break;
                 case "date":
-                    tagHandler = new Date(this, user, query, request, result, node);
+                    tagHandler = new Date(node);
                     break;
                 case "formal":
-                    tagHandler = new Formal(this, user, query, request, result, node);
+                    tagHandler = new Formal(node);
                     break;
                 case "gender":
-                    tagHandler = new AIMLTagHandlers.Gender(this, user, query, request, result, node);
+                    tagHandler = new AIMLTagHandlers.Gender(query, request, node);
                     break;
                 case "get":
-                    tagHandler = new Get(this, user, query, request, result, node);
+                    tagHandler = new Get(user, node);
                     break;
                 case "gossip":
-                    tagHandler = new Gossip(this, user, query, request, result, node);
+                    tagHandler = new Gossip(user, node);
                     break;
                 case "id":
-                    tagHandler = new Id(this, user, query, request, result, node);
+                    tagHandler = new Id(user, node);
                     break;
                 case "input":
-                    tagHandler = new Input(this, user, query, request, result, node);
+                    tagHandler = new Input(user, request, node);
                     break;
                 case "javascript":
-                    tagHandler = new Javascript(this, user, query, request, result, node);
+                    tagHandler = new Javascript(node);
                     break;
                 case "learn":
-                    tagHandler = new Learn(this, user, query, request, result, node);
+                    tagHandler = new Learn(node);
                     break;
                 case "lowercase":
-                    tagHandler = new Lowercase(this, user, query, request, result, node);
+                    tagHandler = new Lowercase(node);
                     break;
                 case "person":
-                    tagHandler = new Person(this, user, query, request, result, node);
+                    tagHandler = new Person(query, request, node);
                     break;
                 case "person2":
-                    tagHandler = new Person2(this, user, query, request, result, node);
+                    tagHandler = new Person2(query, request, node);
                     break;
                 case "random":
-                    tagHandler = new Random(this, user, query, request, result, node);
+                    tagHandler = new Random(node);
                     break;
                 case "sentence":
-                    tagHandler = new Sentence(this, user, query, request, result, node);
+                    tagHandler = new Sentence(query, request, node);
                     break;
                 case "set":
-                    tagHandler = new Set(this, user, query, request, result, node);
+                    tagHandler = new Set(user, node);
                     break;
                 case "size":
-                    tagHandler = new Size(this, user, query, request, result, node);
+                    tagHandler = new Size(node);
                     break;
                 case "sr":
-                    tagHandler = new Sr(this, user, query, request, result, node);
+                    tagHandler = new Sr(this, user, query, request, node);
                     break;
                 case "srai":
-                    tagHandler = new Srai(this, user, query, request, result, node);
+                    tagHandler = new Srai(this, user, request, node);
                     break;
                 case "star":
-                    tagHandler = new Star(this, user, query, request, result, node);
+                    tagHandler = new Star(query, request, node);
                     break;
                 case "system":
                     tagHandler = new SystemTag(this, user, query, request, result, node);
@@ -425,7 +425,7 @@ namespace AIMLbot
                 return tagHandler.Transform();
             }
             var resultNodeInnerXML = tagHandler.Transform();
-            var resultNode = AIMLTagHandler.GetNode("<node>" + resultNodeInnerXML + "</node>");
+            var resultNode = IAIMLTagHandler.GetNode("<node>" + resultNodeInnerXML + "</node>");
             if (resultNode.HasChildNodes)
             {
                 var recursiveResult = new StringBuilder();

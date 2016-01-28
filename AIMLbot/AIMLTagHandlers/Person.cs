@@ -29,37 +29,34 @@ namespace AIMLbot.AIMLTagHandlers
         /// <summary>
         /// Ctor
         /// </summary>
-        /// <param name="chatBot">The ChatBot involved in this request</param>
-        /// <param name="user">The user making the request</param>
         /// <param name="query">The query that originated this node</param>
         /// <param name="request">The request inputted into the system</param>
-        /// <param name="result">The result to be passed to the user</param>
-        /// <param name="templateNode">The node to be processed</param>
-        public Person(ChatBot chatBot,
-                      User user,
-                      SubQuery query,
-                      Request request,
-                      Result result,
-                      XmlNode templateNode)
-            : base(chatBot, user, query, request, result, templateNode)
+        /// <param name="template">The node to be processed</param>
+        public Person(SubQuery query, Request request, XmlNode template) : base(template)
         {
+            Query = query;
+            Request = request;
         }
 
-        protected override string ProcessChange()
+        public SubQuery Query { get; set; }
+
+        public Request Request { get; set; }
+
+        public override string ProcessChange()
         {
             while (true)
             {
-                if (TemplateNode.Name.ToLower() != "person") return string.Empty;
-                if (TemplateNode.InnerText.Length > 0)
+                if (Template.Name.ToLower() != "person") return string.Empty;
+                if (Template.InnerText.Length > 0)
                 {
                     // non atomic version of the node
-                    return TemplateNode.InnerText.Substitute(ChatBot.Person);
+                    return Template.InnerText.Substitute(ChatBot.Person);
                 }
                 // atomic version of the node
                 var starNode = GetNode("<star/>");
-                var recursiveStar = new Star(ChatBot, User, Query, Request, Result, starNode);
-                TemplateNode.InnerText = recursiveStar.Transform();
-                if (!string.IsNullOrEmpty(TemplateNode.InnerText))
+                var recursiveStar = new Star(Query, Request, starNode);
+                Template.InnerText = recursiveStar.ProcessChange();
+                if (!string.IsNullOrEmpty(Template.InnerText))
                 {
                     continue;
                 }

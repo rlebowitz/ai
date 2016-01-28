@@ -22,37 +22,30 @@ namespace AIMLbot.AIMLTagHandlers
         /// <summary>
         ///     Ctor
         /// </summary>
-        /// <param name="chatBot">The ChatBot involved in this request</param>
         /// <param name="user">The user making the request</param>
-        /// <param name="query">The query that originated this node</param>
-        /// <param name="request">The request inputted into the system</param>
-        /// <param name="result">The result to be passed to the user</param>
-        /// <param name="templateNode">The node to be processed</param>
-        public Set(ChatBot chatBot,
-            User user,
-            SubQuery query,
-            Request request,
-            Result result,
-            XmlNode templateNode)
-            : base(chatBot, user, query, request, result, templateNode)
+        /// <param name="template">The node to be processed</param>
+        public Set(User user, XmlNode template) : base(template)
         {
+            User = user;
         }
 
-        protected override string ProcessChange()
+        public User User { get; set; }
+
+        public override string ProcessChange()
         {
-            if (TemplateNode.Name.ToLower() == "set")
+            if (Template.Name.ToLower() == "set")
             {
-                if (TemplateNode.Attributes != null && TemplateNode.Attributes.Count == 1)
+                if (Template.Attributes != null && Template.Attributes.Count == 1)
                 {
-                    if (TemplateNode.Attributes[0].Name.ToLower() == "name")
+                    if (Template.Attributes[0].Name.ToLower() == "name")
                     {
-                        if (TemplateNode.InnerText.Length > 0)
+                        if (Template.InnerText.Length > 0)
                         {
-                            User.Predicates.Add(TemplateNode.Attributes[0].Value, TemplateNode.InnerText);
-                            return User.Predicates[TemplateNode.Attributes[0].Value];
+                            User.Predicates.Add(Template.Attributes[0].Value, Template.InnerText);
+                            return User.Predicates[Template.Attributes[0].Value];
                         }
                         // remove the predicate
-                        User.Predicates.Remove(TemplateNode.Attributes[0].Value);
+                        User.Predicates.Remove(Template.Attributes[0].Value);
                         return string.Empty;
                     }
                 }

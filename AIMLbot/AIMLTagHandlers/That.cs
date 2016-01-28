@@ -23,7 +23,7 @@ namespace AIMLbot.AIMLTagHandlers
     /// 
     /// The template-side that element does not have any content. 
     /// </summary>
-    public class That : AIMLTagHandler
+    public class That : IAIMLTagHandler
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(That));
 

@@ -19,31 +19,17 @@ namespace AIMLbot.AIMLTagHandlers
         /// <summary>
         /// Ctor
         /// </summary>
-        /// <param name="chatBot">The ChatBot involved in this request</param>
-        /// <param name="user">The user making the request</param>
-        /// <param name="query">The query that originated this node</param>
-        /// <param name="request">The request inputted into the system</param>
-        /// <param name="result">The result to be passed to the user</param>
-        /// <param name="templateNode">The node to be processed</param>
-        public Formal(ChatBot chatBot,
-                      User user,
-                      SubQuery query,
-                      Request request,
-                      Result result,
-                      XmlNode templateNode)
-            : base(chatBot, user, query, request, result, templateNode)
+        /// <param name="template">The node to be processed</param>
+        public Formal(XmlNode template) : base(template)
         {
         }
 
-        protected override string ProcessChange()
+        public override string ProcessChange()
         {
-            if (!TemplateNode.Name.Equals("formal", StringComparison.CurrentCultureIgnoreCase)) return string.Empty;
-            if (TemplateNode.InnerText.Length > 0)
-            {
-                var ti = CultureInfo.CurrentCulture.TextInfo;
-                return ti.ToTitleCase(TemplateNode.InnerText.ToLower());
-            }
-            return string.Empty;
+            if (!Template.Name.Equals("formal", StringComparison.CurrentCultureIgnoreCase)) return string.Empty;
+            if (Template.InnerText.Length <= 0) return string.Empty;
+            var ti = CultureInfo.CurrentCulture.TextInfo;
+            return ti.ToTitleCase(Template.InnerText.ToLower());
         }
     }
 }

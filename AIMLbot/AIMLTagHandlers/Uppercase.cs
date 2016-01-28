@@ -11,7 +11,7 @@ namespace AIMLbot.AIMLTagHandlers
     /// If no character in this string has a different uppercase version, based on the Unicode 
     /// standard, then the original string is returned. 
     /// </summary>
-    public class Uppercase : AIMLTagHandler
+    public class Uppercase : IAIMLTagHandler
     {
         /// <summary>
         /// Ctor

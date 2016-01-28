@@ -4,44 +4,48 @@ using AIMLbot.Utils;
 namespace AIMLbot.AIMLTagHandlers
 {
     /// <summary>
-    /// The srai element instructs the AIML interpreter to pass the result of processing the contents 
-    /// of the srai element to the AIML matching loop, as if the input had been produced by the user 
-    /// (this includes stepping through the entire input normalization process). The srai element does 
-    /// not have any attributes. It may contain any AIML template elements. 
-    /// 
-    /// As with all AIML elements, nested forms should be parsed from inside out, so embedded srais are 
-    /// perfectly acceptable. 
+    ///     The srai element instructs the AIML interpreter to pass the result of processing the contents
+    ///     of the srai element to the AIML matching loop, as if the input had been produced by the user
+    ///     (this includes stepping through the entire input normalization process). The srai element does
+    ///     not have any attributes. It may contain any AIML template elements.
+    ///     As with all AIML elements, nested forms should be parsed from inside out, so embedded srais are
+    ///     perfectly acceptable.
     /// </summary>
     public class Srai : AIMLTagHandler
     {
         /// <summary>
-        /// Ctor
+        ///     Ctor
         /// </summary>
         /// <param name="chatBot">The ChatBot involved in this request</param>
         /// <param name="user">The user making the request</param>
-        /// <param name="query">The query that originated this node</param>
         /// <param name="request">The request inputted into the system</param>
-        /// <param name="result">The result to be passed to the user</param>
         /// <param name="templateNode">The node to be processed</param>
         public Srai(ChatBot chatBot,
-                    User user,
-                    SubQuery query,
-                    Request request,
-                    Result result,
-                    XmlNode templateNode)
-            : base(chatBot, user, query, request, result, templateNode)
+            User user,
+            Request request,
+            XmlNode templateNode)
+            : base(templateNode)
         {
+            ChatBot = chatBot;
+            User = user;
+            Request = request;
         }
 
-        protected override string ProcessChange()
+        public ChatBot ChatBot { get; set; }
+
+        public User User { get; set; }
+
+        public Request Request { get; set; }
+
+        public override string ProcessChange()
         {
-            if (TemplateNode.Name.ToLower() == "srai")
+            if (Template.Name.ToLower() == "srai")
             {
-                if (TemplateNode.InnerText.Length > 0)
+                if (Template.InnerText.Length > 0)
                 {
                     // make sure we don't keep adding time to the request
-                    Request subRequest = new Request(TemplateNode.InnerText, User) {StartedOn = Request.StartedOn};
-                    Result subQuery = ChatBot.Chat(subRequest);
+                    var subRequest = new Request(Template.InnerText, User) {StartedOn = Request.StartedOn};
+                    var subQuery = ChatBot.Chat(subRequest);
                     Request.HasTimedOut = subRequest.HasTimedOut;
                     return subQuery.Output;
                 }

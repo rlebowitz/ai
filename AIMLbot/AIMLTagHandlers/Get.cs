@@ -1,3 +1,4 @@
+using System;
 using System.Xml;
 using AIMLbot.Utils;
 
@@ -18,40 +19,24 @@ namespace AIMLbot.AIMLTagHandlers
     public class Get : AIMLTagHandler
     {
         /// <summary>
-        ///     Ctor
+        /// Implements the get tag
         /// </summary>
-        /// <param name="chatBot">The ChatBot involved in this request</param>
         /// <param name="user">The user making the request</param>
-        /// <param name="query">The query that originated this node</param>
-        /// <param name="request">The request inputted into the system</param>
-        /// <param name="result">The result to be passed to the user</param>
-        /// <param name="templateNode">The node to be processed</param>
-        public Get(ChatBot chatBot,
-            User user,
-            SubQuery query,
-            Request request,
-            Result result,
-            XmlNode templateNode)
-            : base(chatBot, user, query, request, result, templateNode)
+        /// <param name="template">The node to be processed</param>
+        public Get(User user, XmlNode template) : base(template)
         {
+            User = user;
         }
 
-        protected override string ProcessChange()
+        public User User { get; set; }
+
+        public override string ProcessChange()
         {
-            if (TemplateNode.Name.ToLower() == "get")
-            {
-                if (TemplateNode.Attributes != null && TemplateNode.Attributes.Count == 1)
-                {
-                    if (TemplateNode.Attributes[0].Name.ToLower() == "name")
-                    {
-                        var value = TemplateNode.Attributes[0].Value;
-                        if (User.Predicates.ContainsKey(value)) { 
-                            return User.Predicates[value];
-                        }
-                    }
-                }
-            }
-            return string.Empty;
+            if (!Template.Name.Equals("get", StringComparison.CurrentCultureIgnoreCase)) return string.Empty;
+            if (Template.Attributes == null || Template.Attributes.Count != 1) return string.Empty;
+            if (Template.Attributes[0].Name.ToLower() != "name") return string.Empty;
+            var value = Template.Attributes[0].Value;
+            return User.Predicates.ContainsKey(value) ? User.Predicates[value] : string.Empty;
         }
     }
 }

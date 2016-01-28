@@ -9,7 +9,7 @@ namespace AIMLbot.AIMLTagHandlers
     /// 
     /// The think element has no attributes. It may contain any AIML template elements.
     /// </summary>
-    public class Think : AIMLTagHandler
+    public class Think : IAIMLTagHandler
     {
         /// <summary>
         /// Ctor

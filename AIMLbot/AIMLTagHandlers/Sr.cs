@@ -19,29 +19,34 @@ namespace AIMLbot.AIMLTagHandlers
         /// <param name="user">The user making the request</param>
         /// <param name="query">The query that originated this node</param>
         /// <param name="request">The request inputted into the system</param>
-        /// <param name="result">The result to be passed to the user</param>
-        /// <param name="templateNode">The node to be processed</param>
-        public Sr(ChatBot chatBot,
-                  User user,
-                  SubQuery query,
-                  Request request,
-                  Result result,
-                  XmlNode templateNode)
-            : base(chatBot, user, query, request, result, templateNode)
+        /// <param name="template">The node to be processed</param>
+        public Sr(ChatBot chatBot, User user, SubQuery query, Request request, XmlNode template) : base(template)
         {
+            ChatBot = chatBot;
+            User = user;
+            Query = query;
+            Request = request;
         }
 
-        protected override string ProcessChange()
+        public ChatBot ChatBot { get; set; }
+
+        public User User { get; set; }
+
+        public SubQuery Query { get; set; }
+
+        public Request Request { get; set; }
+
+        public override string ProcessChange()
         {
-            if (TemplateNode.Name.ToLower() == "sr")
+            if (Template.Name.ToLower() == "sr")
             {
                 XmlNode starNode = GetNode("<star/>");
-                Star recursiveStar = new Star(ChatBot, User, Query, Request, Result, starNode);
-                string starContent = recursiveStar.Transform();
+                Star recursiveStar = new Star(Query, Request, starNode);
+                string starContent = recursiveStar.ProcessChange();
 
                 XmlNode sraiNode = GetNode("<srai>" + starContent + "</srai>");
-                Srai sraiHandler = new Srai(ChatBot, User, Query, Request, Result, sraiNode);
-                return sraiHandler.Transform();
+                Srai sraiHandler = new Srai(ChatBot, User, Request, sraiNode);
+                return sraiHandler.ProcessChange();
             }
             return string.Empty;
         }

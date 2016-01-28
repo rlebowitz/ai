@@ -10,7 +10,7 @@ namespace AIMLbot.AIMLTagHandlers
     /// 
     /// The version element does not have any content. 
     /// </summary>
-    public class Version : AIMLTagHandler
+    public class Version : IAIMLTagHandler
     {
         /// <summary>
         /// Ctor

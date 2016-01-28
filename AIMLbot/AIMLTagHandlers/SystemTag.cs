@@ -7,7 +7,7 @@ namespace AIMLbot.AIMLTagHandlers
     /// <summary>
     /// NOT IMPLEMENTED FOR SECURITY REASONS
     /// </summary>
-    public class SystemTag : AIMLTagHandler
+    public class SystemTag : IAIMLTagHandler
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(SystemTag));
 

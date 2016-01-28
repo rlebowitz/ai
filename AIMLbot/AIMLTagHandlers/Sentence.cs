@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -20,31 +21,28 @@ namespace AIMLbot.AIMLTagHandlers
         /// <summary>
         ///     Ctor
         /// </summary>
-        /// <param name="chatBot">The ChatBot involved in this request</param>
-        /// <param name="user">The user making the request</param>
         /// <param name="query">The query that originated this node</param>
         /// <param name="request">The request inputted into the system</param>
-        /// <param name="result">The result to be passed to the user</param>
-        /// <param name="templateNode">The node to be processed</param>
-        public Sentence(ChatBot chatBot,
-            User user,
-            SubQuery query,
-            Request request,
-            Result result,
-            XmlNode templateNode)
-            : base(chatBot, user, query, request, result, templateNode)
+        /// <param name="template">The node to be processed</param>
+        public Sentence(SubQuery query, Request request, XmlNode template) : base(template)
         {
+            Query = query;
+            Request = request;
         }
 
-        protected override string ProcessChange()
+        public SubQuery Query { get; set; }
+
+        public Request Request { get; set; }
+
+        public override string ProcessChange()
         {
             while (true)
             {
-                if (TemplateNode.Name.ToLower() != "sentence") return string.Empty;
-                if (TemplateNode.InnerText.Length > 0)
+                if (Template.Name.ToLower() != "sentence") return string.Empty;
+                if (Template.InnerText.Length > 0)
                 {
                     var result = new StringBuilder();
-                    var letters = TemplateNode.InnerText.Trim().ToCharArray();
+                    var letters = Template.InnerText.Trim().ToCharArray();
                     var doChange = true;
                     foreach (var t in letters)
                     {
@@ -60,12 +58,12 @@ namespace AIMLbot.AIMLTagHandlers
                         {
                             if (doChange)
                             {
-                                result.Append(letterAsString.ToUpper(ChatBot.Locale));
+                                result.Append(letterAsString.ToUpper(CultureInfo.CurrentCulture));
                                 doChange = false;
                             }
                             else
                             {
-                                result.Append(letterAsString.ToLower(ChatBot.Locale));
+                                result.Append(letterAsString.ToLower(CultureInfo.CurrentCulture));
                             }
                         }
                         else
@@ -77,9 +75,9 @@ namespace AIMLbot.AIMLTagHandlers
                 }
                 // atomic version of the node
                 var starNode = GetNode("<star/>");
-                var recursiveStar = new Star(ChatBot, User, Query, Request, Result, starNode);
-                TemplateNode.InnerText = recursiveStar.Transform();
-                if (!string.IsNullOrEmpty(TemplateNode.InnerText)) continue;
+                var recursiveStar = new Star(Query, Request, starNode);
+                Template.InnerText = recursiveStar.ProcessChange();
+                if (!string.IsNullOrEmpty(Template.InnerText)) continue;
                 return string.Empty;
             }
         }

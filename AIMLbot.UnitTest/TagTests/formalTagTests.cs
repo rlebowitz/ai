@@ -28,7 +28,7 @@ namespace AIMLbot.UnitTest.TagTests
         public void TestEmptyInput()
         {
             var testNode = StaticHelpers.GetNode("<formal/>");
-            _botTagHandler = new Formal(_chatBot, _user, _query, _request, _result, testNode);
+            _botTagHandler = new Formal(testNode);
             Assert.AreEqual("", _botTagHandler.Transform());
         }
 
@@ -36,7 +36,7 @@ namespace AIMLbot.UnitTest.TagTests
         public void TestExpectedCapitalizedInput()
         {
             var testNode = StaticHelpers.GetNode("<formal>THIS IS A TEST</formal>");
-            _botTagHandler = new Formal(_chatBot, _user, _query, _request, _result, testNode);
+            _botTagHandler = new Formal(testNode);
             Assert.AreEqual("This Is A Test", _botTagHandler.Transform());
         }
 
@@ -44,7 +44,7 @@ namespace AIMLbot.UnitTest.TagTests
         public void TestExpectedInput()
         {
             var testNode = StaticHelpers.GetNode("<formal>this is a test</formal>");
-            _botTagHandler = new Formal(_chatBot, _user, _query, _request, _result, testNode);
+            _botTagHandler = new Formal(testNode);
             Assert.AreEqual("This Is A Test", _botTagHandler.Transform());
         }
     }

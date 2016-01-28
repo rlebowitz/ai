@@ -15,7 +15,7 @@ namespace AIMLbot.AIMLTagHandlers
     /// 
     /// The topicstar element does not have any content. 
     /// </summary>
-    public class Topicstar : AIMLTagHandler
+    public class Topicstar : IAIMLTagHandler
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(Topicstar));
 

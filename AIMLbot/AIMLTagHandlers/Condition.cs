@@ -90,7 +90,7 @@ namespace AIMLbot.AIMLTagHandlers
     /// AIML predicate, and a required attribute value, which contains a simple pattern expression. The 
     /// element may contain any AIML template elements. 
     /// </summary>
-    public class Condition : AIMLTagHandler
+    public class Condition : IAIMLTagHandler
     {
         /// <summary>
         /// Primary constructor
