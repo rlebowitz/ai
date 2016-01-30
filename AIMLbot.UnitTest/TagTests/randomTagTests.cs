@@ -1,6 +1,5 @@
 using System.Collections;
 using AIMLbot.AIMLTagHandlers;
-using AIMLbot.Utils;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AIMLbot.UnitTest.TagTests
@@ -8,22 +7,12 @@ namespace AIMLbot.UnitTest.TagTests
     [TestClass]
     public class RandomTagTests
     {
-        private Random _botTagHandler;
-        private ChatBot _chatBot;
+        private Random _tagHandler;
         private ArrayList _possibleResults;
-        private SubQuery _query;
-        private Request _request;
-        private Result _result;
-        private User _user;
 
         [TestInitialize]
         public void Setup()
         {
-            _chatBot = new ChatBot();
-            _user = new User();
-            _request = new Request("This is a test", _user);
-            _query = new SubQuery();
-            _result = new Result(_user, _request);
             _possibleResults = new ArrayList {"random 1", "random 2", "random 3", "random 4", "random 5"};
         }
 
@@ -44,16 +33,16 @@ namespace AIMLbot.UnitTest.TagTests
     <li>random 5</li>
     <bad>bad 5</bad>
 </random>");
-            _botTagHandler = new Random(_chatBot, _user, _query, _request, _result, testNode);
-            Assert.IsTrue(_possibleResults.Contains(_botTagHandler.Transform()));
+            _tagHandler = new Random(testNode);
+            Assert.IsTrue(_possibleResults.Contains(_tagHandler.ProcessChange()));
         }
 
         [TestMethod]
         public void TestWithNoListItems()
         {
             var testNode = StaticHelpers.GetNode("<random/>");
-            _botTagHandler = new Random(_chatBot, _user, _query, _request, _result, testNode);
-            Assert.AreEqual("", _botTagHandler.Transform());
+            _tagHandler = new Random(testNode);
+            Assert.AreEqual("", _tagHandler.ProcessChange());
         }
 
         [TestMethod]
@@ -68,8 +57,8 @@ namespace AIMLbot.UnitTest.TagTests
     <li>random 4</li>
     <li>random 5</li>
 </random>");
-            _botTagHandler = new Random(_chatBot, _user, _query, _request, _result, testNode);
-            Assert.IsTrue(_possibleResults.Contains(_botTagHandler.Transform()));
+            _tagHandler = new Random(testNode);
+            Assert.IsTrue(_possibleResults.Contains(_tagHandler.ProcessChange()));
         }
     }
 }

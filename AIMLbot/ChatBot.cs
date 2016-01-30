@@ -40,7 +40,7 @@ namespace AIMLbot
         /// <summary>
         ///     Flag to show if the ChatBot is willing to accept user input
         /// </summary>
-        public static bool IsAcceptingUserInput { get; set; } = true;
+        public bool IsAcceptingUserInput { get; set; } = true;
 
         /// <summary>
         ///     The maximum number of characters a "that" element of a path is allowed to be. Anything above

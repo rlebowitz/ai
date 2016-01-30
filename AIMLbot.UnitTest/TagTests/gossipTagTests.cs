@@ -12,7 +12,7 @@ namespace AIMLbot.UnitTest.TagTests
     public class GossipTagTests
     {
         private User _user;
-        private Gossip _gossipTagHandler;
+        private Gossip _tagHandler;
         private MemoryAppender _appender;
 
         [TestInitialize]
@@ -20,15 +20,15 @@ namespace AIMLbot.UnitTest.TagTests
         {
             _appender = new MemoryAppender();
             BasicConfigurator.Configure(_appender);
-            _user = new User();
+            _user = new User("1");
         }
 
         [TestMethod]
         public void TestGossipWithEmpty()
         {
             XmlNode testNode = StaticHelpers.GetNode("<gossip/>");
-            _gossipTagHandler = new Gossip(_user, testNode);
-            _gossipTagHandler.ProcessChange();
+            _tagHandler = new Gossip(_user, testNode);
+            _tagHandler.ProcessChange();
             Assert.IsFalse(_appender.GetEvents().Any(le => le.Level == Level.Error),
                 "Did not expect any error messages in the logs");
         }
@@ -37,8 +37,8 @@ namespace AIMLbot.UnitTest.TagTests
         public void TestGossipWithGoodData()
         {
             XmlNode testNode = StaticHelpers.GetNode("<gossip>this is gossip</gossip>");
-            _gossipTagHandler = new Gossip(_user, testNode);
-            _gossipTagHandler.ProcessChange();
+            _tagHandler = new Gossip(_user, testNode);
+            _tagHandler.ProcessChange();
             var last = _appender.GetEvents().Last();
             Assert.AreEqual("GOSSIP from user: 1, 'this is gossip'", last.RenderedMessage);
         }

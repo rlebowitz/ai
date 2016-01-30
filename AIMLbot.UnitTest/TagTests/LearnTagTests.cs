@@ -10,22 +10,16 @@ namespace AIMLbot.UnitTest.TagTests
     public class LearnTagTests
     {
         private ChatBot _chatBot;
-        private User _user;
-        private Request _request;
-        private Result _result;
         private SubQuery _query;
-        private Learn _botTagHandler;
+        private Learn _tagHandler;
 
         [TestInitialize]
         public void Setup()
         {
             _chatBot = new ChatBot();
-            _user = new User();
-            _request = new Request("This is a test", _user);
             _query = new SubQuery();
             _query.InputStar.Insert(0, "first star");
             _query.InputStar.Insert(0, "second star");
-            _result = new Result(_user, _request);
         }
 
         [TestMethod]
@@ -33,8 +27,8 @@ namespace AIMLbot.UnitTest.TagTests
         {
             Assert.AreEqual(0, ChatBot.Size);
             XmlNode testNode = StaticHelpers.GetNode("<learn>./nonexistent/Salutations.aiml</learn>");
-            _botTagHandler = new Learn(testNode);
-            Assert.AreEqual("", _botTagHandler.ProcessChange());
+            _tagHandler = new Learn(testNode);
+            Assert.AreEqual("", _tagHandler.ProcessChange());
             Assert.AreEqual(0, ChatBot.Size);
         }
 
@@ -43,8 +37,8 @@ namespace AIMLbot.UnitTest.TagTests
         {
             Assert.AreEqual(0, ChatBot.Size);
             XmlNode testNode = StaticHelpers.GetNode("<learn/>");
-            _botTagHandler = new Learn(testNode);
-            Assert.AreEqual("", _botTagHandler.ProcessChange());
+            _tagHandler = new Learn(testNode);
+            Assert.AreEqual("", _tagHandler.ProcessChange());
             Assert.AreEqual(0, ChatBot.Size);
         }
 
@@ -54,9 +48,9 @@ namespace AIMLbot.UnitTest.TagTests
             Assert.AreEqual(0, ChatBot.Size);
             var path = Environment.CurrentDirectory + @"\AIML\Salutations.aiml";
             XmlNode testNode = StaticHelpers.GetNode($"<learn>{path}</learn>");
-            _botTagHandler = new Learn(_chatBot, _user, _query, _request, _result, testNode);
-            Assert.AreEqual("", _botTagHandler.Transform());
-            Assert.AreEqual(16, _chatBot.Size);
+            _tagHandler = new Learn(testNode);
+            Assert.AreEqual("", _tagHandler.ProcessChange());
+            Assert.AreEqual(16, ChatBot.Size);
         }
     }
 }

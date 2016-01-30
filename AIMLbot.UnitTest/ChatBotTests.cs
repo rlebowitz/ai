@@ -16,6 +16,7 @@ namespace AIMLbot.UnitTest
         [TestInitialize]
         public void Initialize()
         {
+            _chatBot = new ChatBot();
             _loader = new AIMLLoader();
             var path = @"AIML\ChatBotTests.aiml";
             {
@@ -26,7 +27,7 @@ namespace AIMLbot.UnitTest
         [TestMethod]
         public void TestChatRepsonseWhenNotAcceptingInput()
         {
-            ChatBot.IsAcceptingUserInput = false;
+            _chatBot.IsAcceptingUserInput = false;
             var output = _chatBot.Chat("Hi", "1");
             Assert.AreEqual("This ChatBot is currently set to not accept user input.", output.RawOutput);
         }

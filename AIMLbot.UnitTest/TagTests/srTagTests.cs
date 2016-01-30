@@ -1,5 +1,4 @@
 using System;
-using System.Xml;
 using AIMLbot.AIMLTagHandlers;
 using AIMLbot.Utils;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -9,12 +8,11 @@ namespace AIMLbot.UnitTest.TagTests
     [TestClass]
     public class SrTagTests
     {
+        private Sr _tagHandler;
         private ChatBot _chatBot;
-        private User _user;
-        private Request _request;
-        private Result _result;
         private SubQuery _query;
-        private Sr _botTagHandler;
+        private Request _request;
+        private User _user;
 
         [TestInitialize]
         public void Setup()
@@ -27,41 +25,40 @@ namespace AIMLbot.UnitTest.TagTests
             _query = new SubQuery();
             _query.InputStar.Insert(0, "first star");
             _query.InputStar.Insert(0, "second star");
-            _result = new Result(_user, _request);
         }
 
         [TestMethod]
         public void TestSRAIBad()
         {
-            XmlNode testNode = StaticHelpers.GetNode("<se/>");
-            _botTagHandler = new Sr(_chatBot, _user, _query, _request, _result, testNode);
-            Assert.AreEqual("", _botTagHandler.Transform());
+            var testNode = StaticHelpers.GetNode("<se/>");
+            _tagHandler = new Sr(_chatBot, _user, _query, _request, testNode);
+            Assert.AreEqual("", _tagHandler.ProcessChange());
         }
 
         [TestMethod]
         public void TestSRAIEmpty()
         {
-            XmlNode testNode = StaticHelpers.GetNode("<sr/>");
-            _botTagHandler = new Sr(_chatBot, _user, _query, _request, _result, testNode);
-            Assert.AreEqual("", _botTagHandler.Transform());
+            var testNode = StaticHelpers.GetNode("<sr/>");
+            _tagHandler = new Sr(_chatBot, _user, _query, _request, testNode);
+            Assert.AreEqual("", _tagHandler.ProcessChange());
         }
 
         [TestMethod]
         public void TestSRAIRecursion()
         {
-            XmlNode testNode = StaticHelpers.GetNode("<sr/>");
+            var testNode = StaticHelpers.GetNode("<sr/>");
             _query.InputStar.Insert(0, "srainested");
-            _botTagHandler = new Sr(_chatBot, _user, _query, _request, _result, testNode);
-            Assert.AreEqual("Test passed.", _botTagHandler.Transform());
+            _tagHandler = new Sr(_chatBot, _user, _query, _request, testNode);
+            Assert.AreEqual("Test passed.", _tagHandler.ProcessChange());
         }
 
         [TestMethod]
         public void TestSRAIWithValidInput()
         {
-            XmlNode testNode = StaticHelpers.GetNode("<sr/>");
+            var testNode = StaticHelpers.GetNode("<sr/>");
             _query.InputStar.Insert(0, "sraisucceeded");
-            _botTagHandler = new Sr(_chatBot, _user, _query, _request, _result, testNode);
-            Assert.AreEqual("Test passed.", _botTagHandler.Transform());
+            _tagHandler = new Sr(_chatBot, _user, _query, _request, testNode);
+            Assert.AreEqual("Test passed.", _tagHandler.ProcessChange());
         }
     }
 }

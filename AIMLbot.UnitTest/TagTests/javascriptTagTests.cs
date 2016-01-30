@@ -7,7 +7,7 @@ namespace AIMLbot.UnitTest.TagTests
     [TestClass]
     public class JavascriptTagTests
     {
-        private Javascript _javaTagHandler;
+        private Javascript _tagHandler;
 
         [TestInitialize]
         public void Setup()
@@ -18,8 +18,8 @@ namespace AIMLbot.UnitTest.TagTests
         public void TestJavascriptIsNotImplemented()
         {
             XmlNode testNode = StaticHelpers.GetNode("<javascript/>");
-            _javaTagHandler = new Javascript(testNode);
-            Assert.AreEqual("", _javaTagHandler.ProcessChange());
+            _tagHandler = new Javascript(testNode);
+            Assert.AreEqual("", _tagHandler.ProcessChange());
         }
     }
 }

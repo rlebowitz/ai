@@ -13,7 +13,7 @@ namespace AIMLbot.UnitTest.TagTests
         [TestInitialize]
         public void Setup()
         {
-            _user = new User();
+            _user = new User("1");
         }
 
         [TestMethod]

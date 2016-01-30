@@ -1,6 +1,4 @@
-using System.Xml;
 using AIMLbot.AIMLTagHandlers;
-using AIMLbot.Utils;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AIMLbot.UnitTest.TagTests
@@ -8,37 +6,27 @@ namespace AIMLbot.UnitTest.TagTests
     [TestClass]
     public class LowercaseTagTests
     {
-        private ChatBot _chatBot;
-        private User _user;
-        private Request _request;
-        private Result _result;
-        private SubQuery _query;
-        private Lowercase _botTagHandler;
+        private Lowercase _tagHandler;
 
         [TestInitialize]
-        public void SetupMockObjects()
+        public void Setup()
         {
-            _chatBot = new ChatBot();
-            _user = new User();
-            _request = new Request("This is a test", _user);
-            _query = new SubQuery();
-            _result = new Result(_user, _request);
         }
 
         [TestMethod]
         public void TestEmptyInput()
         {
-            XmlNode testNode = StaticHelpers.GetNode("<lowercase/>");
-            _botTagHandler = new Lowercase(_chatBot, _user, _query, _request, _result, testNode);
-            Assert.AreEqual("", _botTagHandler.Transform());
+            var testNode = StaticHelpers.GetNode("<lowercase/>");
+            _tagHandler = new Lowercase(testNode);
+            Assert.AreEqual("", _tagHandler.ProcessChange());
         }
 
         [TestMethod]
         public void TestExpectedInput()
         {
-            XmlNode testNode = StaticHelpers.GetNode("<lowercase>THIS IS A TEST</lowercase>");
-            _botTagHandler = new Lowercase(_chatBot, _user, _query, _request, _result, testNode);
-            Assert.AreEqual("this is a test", _botTagHandler.Transform());
+            var testNode = StaticHelpers.GetNode("<lowercase>THIS IS A TEST</lowercase>");
+            _tagHandler = new Lowercase(testNode);
+            Assert.AreEqual("this is a test", _tagHandler.ProcessChange());
         }
     }
 }
