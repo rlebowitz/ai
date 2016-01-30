@@ -490,15 +490,23 @@ namespace AIMLbot
         {
             if (fileInfo != null && fileInfo.Exists)
             {
-                using (var stream = fileInfo.OpenRead())
+                try
                 {
-                    var formatter = new BinaryFormatter();
-                    Graphmaster = (Node) formatter.Deserialize(stream);
+                    using (var stream = fileInfo.OpenRead())
+                    {
+                        var formatter = new BinaryFormatter();
+                        Graphmaster = (Node) formatter.Deserialize(stream);
+                    }
+                }
+                catch (SerializationException sex)
+                {
+                    throw new SerializationException("Unable to deserialize the AIML Graph.");
                 }
             }
             else
             {
-                throw new SerializationException("Unable to deserialize the AIML Graph.");
+                throw new FileNotFoundException("Unable to find the AIML Graph.");
+
             }
         }
 

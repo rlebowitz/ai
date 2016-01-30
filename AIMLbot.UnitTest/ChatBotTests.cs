@@ -9,16 +9,21 @@ namespace AIMLbot.UnitTest
     [TestClass]
     public class ChatBotTests
     {
-        private static ChatBot _chatBot;
+        private ChatBot _chatBot;
 
-        private static AIMLLoader _loader;
+        private AIMLLoader _loader;
+
+        [ClassInitialize()]
+        public static void ClassInit(TestContext context)
+        {
+        }
 
         [TestInitialize]
         public void Initialize()
         {
             _chatBot = new ChatBot();
             _loader = new AIMLLoader();
-            var path = @"AIML\ChatBotTests.aiml";
+            const string path = @"AIML\ChatBotTests.aiml";
             {
                 _loader.LoadAIML(path);
             }
@@ -32,23 +37,6 @@ namespace AIMLbot.UnitTest
             Assert.AreEqual("This ChatBot is currently set to not accept user input.", output.RawOutput);
         }
 
-        //[TestMethod]
-        //public void TestLoadFromAIML()
-        //{
-        //    _chatBot = new ChatBot();
-        //    _chatBot.LoadAIML();
-        //    Assert.AreEqual(sizeTagTests.Size, _chatBot.Size);
-        //}
-
-        [TestMethod]
-        public void TestLoadFromBinary()
-        {
-            _chatBot = new ChatBot();
-            _chatBot.LoadFromBinaryFile();
-            var output = _chatBot.Chat("bye", "1");
-            Assert.AreEqual("Cheerio.", output.RawOutput);
-        }
-
         [TestMethod]
         public void TestSaveSerialization()
         {
@@ -57,6 +45,15 @@ namespace AIMLbot.UnitTest
             var fullPath = $@"{Environment.CurrentDirectory}\{path}";
             var fileInfo = new FileInfo(fullPath);
             Assert.AreEqual(true, fileInfo.Exists);
+        }
+
+        [TestMethod]
+        public void TestLoadFromBinary()
+        {
+            _chatBot = new ChatBot();
+            _chatBot.LoadFromBinaryFile();
+            var output = _chatBot.Chat("bye", "1");
+            Assert.AreEqual("Cheerio.", output.RawOutput);
         }
 
         [TestMethod]
