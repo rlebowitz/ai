@@ -46,7 +46,8 @@ namespace AIMLbot.AIMLTagHandlers
                     // make sure we don't keep adding time to the request
                     var subRequest = new Request(Template.InnerText, User) {StartedOn = Request.StartedOn};
                     var subQuery = ChatBot.Chat(subRequest);
-                    Request.HasTimedOut = subRequest.HasTimedOut;
+                    // with new task timeout, shouldn't need to do this
+ //                   Request.HasTimedOut = subRequest.HasTimedOut;
                     return subQuery.Output;
                 }
             }

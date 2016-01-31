@@ -81,22 +81,15 @@ namespace AIMLbot
                 {
                     return RawOutput;
                 }
-                else
+                var paths = new StringBuilder();
+                foreach (var pattern in NormalizedPaths)
                 {
-                    if (Request.HasTimedOut)
-                    {
-                        return ChatBot.TimeOutMessage;
-                    }
-                    StringBuilder paths = new StringBuilder();
-                    foreach (string pattern in NormalizedPaths)
-                    {
-                        paths.Append(pattern + Environment.NewLine);
-                    }
-                    Log.Error("The ChatBot could not find any response for the input: " + RawInput +
-                              " with the path(s): " + Environment.NewLine + paths +
-                              " from the user with an id: " + User.UserId);
-                    return string.Empty;
+                    paths.Append(pattern + Environment.NewLine);
                 }
+                Log.Error("The ChatBot could not find any response for the input: " + RawInput +
+                          " with the path(s): " + Environment.NewLine + paths +
+                          " from the user with an id: " + User.UserId);
+                return string.Empty;
             }
         }
 

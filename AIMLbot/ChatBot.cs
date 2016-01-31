@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Globalization;
 using System.IO;
-using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using AIMLbot.AIMLTagHandlers;
@@ -20,7 +21,7 @@ using Version = AIMLbot.AIMLTagHandlers.Version;
 namespace AIMLbot
 {
     /// <summary>
-    /// A simple c# AIML Bot designed for use in desktop, web and embedded systems.
+    ///     A simple c# AIML Bot designed for use in desktop, web and embedded systems.
     /// </summary>
     public class ChatBot
     {
@@ -30,6 +31,64 @@ namespace AIMLbot
         {
             Graphmaster = new Node();
             PathGenerator = new PathGenerator();
+        }
+
+        /// <summary>
+        ///     Saves the graphmaster node (and children) to a binary file to avoid processing the AIML each time the
+        ///     ChatBot starts
+        /// </summary>
+        public void SaveToBinaryFile()
+        {
+            var path = ConfigurationManager.AppSettings.Get("graphMasterFile", "GraphMaster.dat");
+            var fullPath = $@"{Environment.CurrentDirectory}\{path}";
+            SaveToBinaryFile(new FileInfo(fullPath));
+        }
+
+        /// <summary>
+        ///     Saves the graphmaster node (and children) to a binary file to avoid processing the AIML each time the
+        ///     ChatBot starts
+        /// </summary>
+        public void SaveToBinaryFile(FileInfo fileInfo)
+        {
+            if (fileInfo.Exists)
+            {
+                fileInfo.Delete();
+            }
+            using (var stream = fileInfo.Create())
+            {
+                var formatter = new BinaryFormatter();
+                formatter.Serialize(stream, Graphmaster);
+            }
+        }
+
+        /// <summary>
+        ///     Loads a dump of the graphmaster into memory so avoiding processing the AIML files again
+        /// </summary>
+        public void LoadFromBinaryFile()
+        {
+            var path = ConfigurationManager.AppSettings.Get("graphMasterFile", "GraphMaster.dat");
+            var fullPath = $@"{Environment.CurrentDirectory}\{path}";
+            LoadFromBinaryFile(new FileInfo(fullPath));
+        }
+
+        /// <summary>
+        ///     Loads a dump of the graphmaster into memory so avoiding processing the AIML files again
+        /// </summary>
+        /// <param name="fileInfo">The specific file to load.</param>
+        public void LoadFromBinaryFile(FileInfo fileInfo)
+        {
+            if (fileInfo != null && fileInfo.Exists)
+            {
+                using (var stream = fileInfo.OpenRead())
+                {
+                    var formatter = new BinaryFormatter();
+                    Graphmaster = (Node) formatter.Deserialize(stream);
+                }
+            }
+            else
+            {
+                throw new FileNotFoundException("Unable to find the AIML Graph.");
+            }
         }
 
         #region Attributes
@@ -205,8 +264,7 @@ namespace AIMLbot
         /// <returns>the result to be output to the user</returns>
         public Result Chat(string rawInput)
         {
-            var request = new Request(rawInput, new User());
-            return Chat(request);
+            return Chat(rawInput, RandomStringGenerator.GetUniqueId());
         }
 
         /// <summary>
@@ -218,33 +276,66 @@ namespace AIMLbot
         public Result Chat(string rawInput, string userGuid)
         {
             var request = new Request(rawInput, new User(userGuid));
-            return Chat(request);
+            Task<Result> result = null;
+            //http://codereview.stackexchange.com/questions/23020/c-5-async-await-task-factory-startnew-cancellation
+            var cancellationToken = new CancellationTokenSource(TimeSpan.FromSeconds(TimeOut)).Token;
+            var chatTask = Task.Run(() =>
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                }
+                return Chat(request);
+            }, cancellationToken);
+
+            try
+            {
+                result = chatTask;
+            }
+            catch (OperationCanceledException ex)
+            {
+                Log.Error("cancelled", ex);                
+            }
+
+            if (result != null) return result.Result;
+            var newResult = new Result(request.User, request);
+            newResult.OutputSentences.Add(string.Empty);
+            return newResult;
         }
 
         /// <summary>
         ///     Given a request containing user input, produces a result from the ChatBot
         /// </summary>
+        /// <remarks>
+        /// User input should be passed to one of the two overloads for this method so that the automatic 
+        /// cancellation / timeout method will be used.
+        /// </remarks>
         /// <param name="request">the request from the user</param>
         /// <returns>the result to be output to the user</returns>
         public Result Chat(Request request)
         {
             var result = new Result(request.User, request);
 
-            if (IsAcceptingUserInput)
+            if (!IsAcceptingUserInput)
+            {
+                result.OutputSentences.Add(_notAcceptMessage);
+            }
+            else
             {
                 // Normalize the input
                 var rawSentences = request.RawInput.SplitStrings();
                 foreach (var sentence in rawSentences)
                 {
                     result.InputSentences.Add(sentence);
-                    var path = PathGenerator.Generate(sentence, request.User.GetLastBotOutput(), request.User.Topic, true);
+                    var path = PathGenerator.Generate(sentence, request.User.GetLastBotOutput(), request.User.Topic,
+                        true);
                     result.NormalizedPaths.Add(path);
                 }
 
                 // grab the templates for the various sentences from the graphmaster
                 foreach (var path in result.NormalizedPaths)
                 {
-                    var searcher = new NodeSearcher(request);
+                    var searcher = new NodeSearcher();
                     searcher.Evaluate(Graphmaster, path, MatchState.UserInput, new StringBuilder());
                     result.SubQueries.Add(searcher.Query);
                 }
@@ -257,7 +348,7 @@ namespace AIMLbot
                         try
                         {
                             var templateNode = AIMLTagHandler.GetNode(query.Template);
-                            var outputSentence = ProcessNode(templateNode, query, request, result, request.User);
+                            var outputSentence = ProcessNode(templateNode, query, request, request.User);
                             if (outputSentence.Length > 0)
                             {
                                 result.OutputSentences.Add(outputSentence);
@@ -270,10 +361,6 @@ namespace AIMLbot
                         }
                     }
                 }
-            }
-            else
-            {
-                result.OutputSentences.Add(_notAcceptMessage);
             }
 
             // populate the Result object
@@ -288,20 +375,10 @@ namespace AIMLbot
         /// <param name="node">the node to evaluate</param>
         /// <param name="query">the query that produced this node</param>
         /// <param name="request">the request from the user</param>
-        /// <param name="result">the result to be sent to the user</param>
         /// <param name="user">the user who originated the request</param>
         /// <returns>the output string</returns>
-        private string ProcessNode(XmlNode node, SubQuery query, Request request, Result result, User user)
+        private string ProcessNode(XmlNode node, SubQuery query, Request request, User user)
         {
-            // check for timeout (to avoid infinite loops)
-            if (request.StartedOn.AddMilliseconds(TimeOut) < DateTime.Now)
-            {
-                Log.Error("WARNING! Request timeout. User: " + request.User.UserId + " raw input: \"" +
-                          request.RawInput + "\" processing template: \"" + query.Template + "\"");
-                request.HasTimedOut = true;
-                return string.Empty;
-            }
-
             // process the node
             var tagName = node.Name.ToLower();
             if (tagName == "template")
@@ -312,7 +389,7 @@ namespace AIMLbot
                     // recursively check
                     foreach (XmlNode childNode in node.ChildNodes)
                     {
-                        templateResult.Append(ProcessNode(childNode, query, request, result, user));
+                        templateResult.Append(ProcessNode(childNode, query, request, user));
                     }
                 }
                 return templateResult.ToString();
@@ -421,7 +498,7 @@ namespace AIMLbot
                     {
                         if (childNode.NodeType != XmlNodeType.Text)
                         {
-                            childNode.InnerXml = ProcessNode(childNode, query, request, result, user);
+                            childNode.InnerXml = ProcessNode(childNode, query, request, user);
                         }
                     }
                 }
@@ -435,7 +512,7 @@ namespace AIMLbot
                 // recursively check
                 foreach (XmlNode childNode in resultNode.ChildNodes)
                 {
-                    recursiveResult.Append(ProcessNode(childNode, query, request, result, user));
+                    recursiveResult.Append(ProcessNode(childNode, query, request, user));
                 }
                 return recursiveResult.ToString();
             }
@@ -443,64 +520,5 @@ namespace AIMLbot
         }
 
         #endregion
-
-        /// <summary>
-        ///     Saves the graphmaster node (and children) to a binary file to avoid processing the AIML each time the
-        ///     ChatBot starts
-        /// </summary>
-        public void SaveToBinaryFile()
-        {
-            var path = ConfigurationManager.AppSettings.Get("graphMasterFile", "GraphMaster.dat");
-            var fullPath = $@"{Environment.CurrentDirectory}\{path}";
-            SaveToBinaryFile(new FileInfo(fullPath));
-        }
-
-        /// <summary>
-        ///     Saves the graphmaster node (and children) to a binary file to avoid processing the AIML each time the
-        ///     ChatBot starts
-        /// </summary>
-        public void SaveToBinaryFile(FileInfo fileInfo)
-        {
-            if (fileInfo.Exists)
-            {
-                fileInfo.Delete();
-            }
-            using (var stream = fileInfo.Create())
-            {
-                var formatter = new BinaryFormatter();
-                formatter.Serialize(stream, Graphmaster);
-            }
-        }
-
-        /// <summary>
-        ///     Loads a dump of the graphmaster into memory so avoiding processing the AIML files again
-        /// </summary>
-        public void LoadFromBinaryFile()
-        {
-            var path = ConfigurationManager.AppSettings.Get("graphMasterFile", "GraphMaster.dat");
-            var fullPath = $@"{Environment.CurrentDirectory}\{path}";
-            LoadFromBinaryFile(new FileInfo(fullPath));
-        }
-
-        /// <summary>
-        ///     Loads a dump of the graphmaster into memory so avoiding processing the AIML files again
-        /// </summary>
-        /// <param name="fileInfo">The specific file to load.</param>
-        public void LoadFromBinaryFile(FileInfo fileInfo)
-        {
-            if (fileInfo != null && fileInfo.Exists)
-            {
-                    using (var stream = fileInfo.OpenRead())
-                    {
-                        var formatter = new BinaryFormatter();
-                        Graphmaster = (Node) formatter.Deserialize(stream);
-                    }
-            }
-            else
-            {
-                throw new FileNotFoundException("Unable to find the AIML Graph.");
-
-            }
-        }
     }
 }

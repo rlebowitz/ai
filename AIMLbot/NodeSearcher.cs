@@ -2,16 +2,13 @@
 using System.Configuration;
 using System.Text;
 using AIMLbot.Utils;
-using log4net;
 
 namespace AIMLbot
 {
     public class NodeSearcher
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof (ChatBot));
         private static readonly string Time = ConfigurationManager.AppSettings["timeoutMax"];
 
-        private Request Request { get; }
         public SubQuery Query { get; }
         /// <summary>
         /// Used to set the number of milliseconds before the search times out.
@@ -21,24 +18,10 @@ namespace AIMLbot
         /// <summary>
         ///     Used to navigate the graph.
         /// </summary>
-        /// <param name="request">An encapsulation of the request from the user</param>
-        public NodeSearcher(Request request)
+        public NodeSearcher()
         {
-            Request = request;
             Query = new SubQuery();
             Timeout = Convert.ToInt32(Time);
-        }
-
-        private bool HasTimedOut()
-        {
-            if (Request.StartedOn.AddMilliseconds(Timeout) < DateTime.Now)
-            {
-                Request.HasTimedOut = true;
-                Log.Error("WARNING! Request timeout. User: " + Request.User.UserId + " raw input: \"" +
-                          Request.RawInput + "\"");
-                return true;
-            }
-            return false;
         }
 
         /// <summary>
@@ -54,12 +37,6 @@ namespace AIMLbot
         {
             while (true)
             {
-                // check for timeout
-                if (HasTimedOut())
-                {
-                    return string.Empty;
-                }
-
                 // so we still have time!
                 path = path.Trim();
 

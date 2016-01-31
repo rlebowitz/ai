@@ -10,11 +10,6 @@ namespace AIMLbot
         #region Attributes
 
         /// <summary>
-        /// Flag to show that the request has timed out
-        /// </summary>
-        public bool HasTimedOut = false;
-
-        /// <summary>
         /// The raw input from the user
         /// </summary>
         public string RawInput;
@@ -37,7 +32,7 @@ namespace AIMLbot
         #endregion
 
         /// <summary>
-        /// Ctor
+        /// Creates an instance of the Request object.
         /// </summary>
         /// <param name="rawInput">The raw input from the user</param>
         /// <param name="user">The user who made the request</param>
