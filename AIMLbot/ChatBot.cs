@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 using AIMLbot.AIMLTagHandlers;
+using AIMLbot.Normalize;
 using AIMLbot.Utils;
 using log4net;
 using Gender = AIMLbot.Utils.Gender;
@@ -28,6 +29,7 @@ namespace AIMLbot
         public ChatBot()
         {
             Graphmaster = new Node();
+            PathGenerator = new PathGenerator();
         }
 
         #region Attributes
@@ -161,6 +163,8 @@ namespace AIMLbot
             => Path.Combine(Environment.CurrentDirectory, ConfigurationManager.AppSettings.Get("aimldirectory", "AIML"))
             ;
 
+        private PathGenerator PathGenerator { get; }
+
         #endregion
 
         #region Settings methods
@@ -229,13 +233,11 @@ namespace AIMLbot
             if (IsAcceptingUserInput)
             {
                 // Normalize the input
-                var loader = new AIMLLoader();
                 var rawSentences = request.RawInput.SplitStrings();
                 foreach (var sentence in rawSentences)
                 {
                     result.InputSentences.Add(sentence);
-                    var path =
-                        loader.GeneratePath(sentence, request.User.GetLastBotOutput(), request.User.Topic, true);
+                    var path = PathGenerator.Generate(sentence, request.User.GetLastBotOutput(), request.User.Topic, true);
                     result.NormalizedPaths.Add(path);
                 }
 
@@ -442,8 +444,6 @@ namespace AIMLbot
 
         #endregion
 
-        #region Serialization
-
         /// <summary>
         ///     Saves the graphmaster node (and children) to a binary file to avoid processing the AIML each time the
         ///     ChatBot starts
@@ -490,18 +490,11 @@ namespace AIMLbot
         {
             if (fileInfo != null && fileInfo.Exists)
             {
-                try
-                {
                     using (var stream = fileInfo.OpenRead())
                     {
                         var formatter = new BinaryFormatter();
                         Graphmaster = (Node) formatter.Deserialize(stream);
                     }
-                }
-                catch (SerializationException sex)
-                {
-                    throw new SerializationException("Unable to deserialize the AIML Graph.");
-                }
             }
             else
             {
@@ -509,7 +502,5 @@ namespace AIMLbot
 
             }
         }
-
-        #endregion
     }
 }

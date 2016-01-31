@@ -59,6 +59,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="PathGeneratorTests.cs" />
     <Compile Include="AIMLLoaderTests.cs" />
     <Compile Include="ChatBotTests.cs" />
     <Compile Include="Normalize\ApplySubstitutionsTests.cs" />
@@ -145,23 +146,23 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="DefaultPredicates.xml">
+    <Content Include="Config\DefaultPredicates.xml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="GenderSubstitutions.xml">
+    <Content Include="Config\GenderSubstitutions.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Person2Substitutions.xml">
+    <Content Include="Config\Person2Substitutions.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="PersonSubstitutions.xml">
+    <Content Include="Config\PersonSubstitutions.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Splitters.xml">
+    <Content Include="Config\Splitters.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Substitutions.xml">
+    <Content Include="Config\Substitutions.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

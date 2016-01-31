@@ -85,6 +85,7 @@
     <Compile Include="AIMLTagHandlers\Version.cs" />
     <Compile Include="ChatBot.cs" />
     <Compile Include="NodeSearcher.cs" />
+    <Compile Include="Normalize\PathGenerator.cs" />
     <Compile Include="Request.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="User.cs" />
@@ -135,7 +136,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AIML\" />
-    <Folder Include="Normalize\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
