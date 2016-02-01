@@ -138,6 +138,12 @@
   <ItemGroup>
     <Folder Include="AIML\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AIMLbot.Spell\AIMLbot.Spell.csproj">
+      <Project>{f0162102-71f2-4a30-ab2b-3621aba0874c}</Project>
+      <Name>AIMLbot.Spell</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
