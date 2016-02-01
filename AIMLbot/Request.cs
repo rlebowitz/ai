@@ -12,22 +12,21 @@ namespace AIMLbot
         /// <summary>
         /// The raw input from the user
         /// </summary>
-        public string RawInput;
-
+        public string RawInput { get; set; }
         /// <summary>
         /// The final result produced by this request
         /// </summary>
-        public Result Result;
-
+        public Result Result { get; set; }
         /// <summary>
         /// The time at which this request was created within the system
         /// </summary>
-        public DateTime StartedOn;
-
+        public DateTime StartedOn { get; set; }
+        public DateTime EndTime { get; set; }
+ 
         /// <summary>
         /// The user who made this request
         /// </summary>
-        public User User;
+        public User User { get; set; }
 
         #endregion
 
@@ -41,6 +40,15 @@ namespace AIMLbot
             RawInput = rawInput;
             User = user;
             StartedOn = DateTime.Now;
+            EndTime = StartedOn.AddMilliseconds(ChatBot.TimeOut);
+        }
+
+        /// <summary>
+        /// Used to prevent infinite loops and stack overflows.
+        /// </summary>
+        public bool HasTimedOut()
+        {
+            return DateTime.Now > EndTime;
         }
     }
 }

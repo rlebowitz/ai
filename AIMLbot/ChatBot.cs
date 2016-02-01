@@ -6,8 +6,6 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using AIMLbot.AIMLTagHandlers;
@@ -103,7 +101,7 @@ namespace AIMLbot
         /// </summary>
         public bool IsAcceptingUserInput { get; set; } = true;
 
-        /// <summary>
+         /// <summary>
         ///     The maximum number of characters a "that" element of a path is allowed to be. Anything above
         ///     this length will cause "that" to be "*". This is to avoid having the graphmaster process
         ///     huge "that" elements in the path that might have been caused by the ChatBot reporting third party
@@ -166,7 +164,7 @@ namespace AIMLbot
         /// <summary>
         ///     The maximum amount of time a request should take (in milliseconds)
         /// </summary>
-        public double TimeOut = ConfigurationManager.AppSettings.Get("timeoutMax", 30000.0);
+        public static double TimeOut = ConfigurationManager.AppSettings.Get("timeoutMax", 3000.0);
 
         /// <summary>
         ///     The message to display in the event of a timeout
@@ -276,31 +274,10 @@ namespace AIMLbot
         public Result Chat(string rawInput, string userGuid)
         {
             var request = new Request(rawInput, new User(userGuid));
-            Task<Result> result = null;
-            //http://codereview.stackexchange.com/questions/23020/c-5-async-await-task-factory-startnew-cancellation
-            var cancellationToken = new CancellationTokenSource(TimeSpan.FromSeconds(TimeOut)).Token;
-            var chatTask = Task.Run(() =>
-            {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-                }
-                return Chat(request);
-            }, cancellationToken);
-
-            try
-            {
-                result = chatTask;
-            }
-            catch (OperationCanceledException ex)
-            {
-                Log.Error("cancelled", ex);                
-            }
-
-            if (result != null) return result.Result;
-            var newResult = new Result(request.User, request);
-            newResult.OutputSentences.Add(string.Empty);
-            return newResult;
+            return Chat(request);
+            //var newResult = new Result(request.User, request);
+            //newResult.OutputSentences.Add(string.Empty);
+            //return newResult;
         }
 
         /// <summary>
@@ -315,6 +292,13 @@ namespace AIMLbot
         public Result Chat(Request request)
         {
             var result = new Result(request.User, request);
+
+            if (request.HasTimedOut())
+            {
+                result.Duration = DateTime.Now - request.StartedOn;
+                result.OutputSentences.Add(TimeOutMessage);
+                return result;
+            }
 
             if (!IsAcceptingUserInput)
             {

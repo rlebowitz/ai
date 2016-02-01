@@ -13,11 +13,6 @@ namespace AIMLbot.UnitTest
 
         private AIMLLoader _loader;
 
-        [ClassInitialize()]
-        public static void ClassInit(TestContext context)
-        {
-        }
-
         [TestInitialize]
         public void Initialize()
         {
@@ -64,16 +59,18 @@ namespace AIMLbot.UnitTest
             Assert.AreEqual("Cheerio.", output.Output);
         }
 
-        //[TestMethod]
-        //public void TestTimeOutChatWorks()
-        //{
-        //    const string path = @"AIML\Srai.aiml";
-        //    {
-        //        _loader.LoadAIML(path);
-        //    }
-        //    var output = _chatBot.Chat("infiniteloop1", "1");
-        //    Assert.AreEqual("ERROR: The request has timed out.", output.Output);
-        //}
+        [TestMethod]
+        public void TestTimeOutChatWorks()
+        {
+            var chatBot = new ChatBot();
+            const string path = @"AIML\Srai.aiml";
+            {
+                _loader.LoadAIML(path);
+            }
+            ChatBot.TimeOut = 30;
+            var output = chatBot.Chat("infiniteloop1", "1");
+            Assert.AreEqual("ERROR: The request has timed out.", output.Output);
+        }
 
         [TestMethod]
         public void TestWildCardsDontMixBetweenSentences()

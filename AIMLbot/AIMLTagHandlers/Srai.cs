@@ -44,11 +44,9 @@ namespace AIMLbot.AIMLTagHandlers
                 if (Template.InnerText.Length > 0)
                 {
                     // make sure we don't keep adding time to the request
-                    var subRequest = new Request(Template.InnerText, User) {StartedOn = Request.StartedOn};
-                    var subQuery = ChatBot.Chat(subRequest);
-                    // with new task timeout, shouldn't need to do this
- //                   Request.HasTimedOut = subRequest.HasTimedOut;
-                    return subQuery.Output;
+                    var request = new Request(Template.InnerText, User) {StartedOn = Request.StartedOn, EndTime = Request.EndTime };
+                    var result = ChatBot.Chat(request);
+                    return result.Output;
                 }
             }
             return string.Empty;

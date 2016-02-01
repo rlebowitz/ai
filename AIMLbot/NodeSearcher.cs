@@ -10,10 +10,6 @@ namespace AIMLbot
         private static readonly string Time = ConfigurationManager.AppSettings["timeoutMax"];
 
         public SubQuery Query { get; }
-        /// <summary>
-        /// Used to set the number of milliseconds before the search times out.
-        /// </summary>
-        public int Timeout { get; set; }
 
         /// <summary>
         ///     Used to navigate the graph.
@@ -21,7 +17,6 @@ namespace AIMLbot
         public NodeSearcher()
         {
             Query = new SubQuery();
-            Timeout = Convert.ToInt32(Time);
         }
 
         /// <summary>

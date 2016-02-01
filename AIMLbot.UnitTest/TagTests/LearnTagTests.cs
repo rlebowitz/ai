@@ -17,6 +17,8 @@ namespace AIMLbot.UnitTest.TagTests
         public void Setup()
         {
             _chatBot = new ChatBot();
+            ChatBot.Graphmaster = new Node();
+            ChatBot.Size = 0;
             _query = new SubQuery();
             _query.InputStar.Insert(0, "first star");
             _query.InputStar.Insert(0, "second star");
