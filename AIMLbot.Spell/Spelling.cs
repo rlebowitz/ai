@@ -14,19 +14,28 @@ namespace AIMLbot.Spell
     /// </remarks>
     public class Spelling
     {
-        private readonly Dictionary<string, int> _dictionary = new Dictionary<String, int>();
-        private static readonly Regex WordRegex = new Regex("[a-z]+", RegexOptions.Compiled);
+        private readonly Dictionary<string, int> _dictionary = new Dictionary<string, int>();
+        private static readonly Regex Words = new Regex(@"\b([a-ZA-Z]+)\b", RegexOptions.Compiled);
 
         public Spelling()
         {
-            string fileContent = File.ReadAllText("big.txt");
-            List<string> wordList = fileContent.Split('\n').ToList();
-
-            foreach (var word in wordList)
+            using (var file = new StreamReader("big.txt"))
             {
-                string trimmedWord = word.Trim().ToLower();
-                if (WordRegex.IsMatch(trimmedWord))
+                string line;
+                while ((line = file.ReadLine()) != null)
                 {
+                    Parse(line);
+                }
+            }
+        }
+
+        private void Parse(string line) { 
+            var matches = Words.Matches(line);            
+            foreach (Match match in matches)
+            {
+                GroupCollection groups = match.Groups;
+                foreach (Group group in groups) {  
+                    string trimmedWord = group.Value.ToLower();
                     if (_dictionary.ContainsKey(trimmedWord))
                         _dictionary[trimmedWord]++;
                     else
@@ -46,7 +55,7 @@ namespace AIMLbot.Spell
             if (_dictionary.ContainsKey(word))
                 return word;
 
-            List<String> list = Edits(word);
+            List<string> list = Edits(word);
             Dictionary<string, int> candidates = new Dictionary<string, int>();
 
             foreach (string wordVariation in list)

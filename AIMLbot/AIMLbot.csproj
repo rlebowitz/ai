@@ -110,24 +110,25 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ConfigurationFiles\DefaultPredicates.xml">
+    <Content Include="Config\DefaultPredicates.xml">
       <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="ConfigurationFiles\GenderSubstitutions.xml" />
-    <Content Include="ConfigurationFiles\Person2Substitutions.xml" />
-    <Content Include="ConfigurationFiles\PersonSubstitutions.xml" />
-    <Content Include="ConfigurationFiles\Settings.xml" />
-    <Content Include="ConfigurationFiles\Splitters.xml" />
-    <Content Include="ConfigurationFiles\Substitutions.xml" />
-    <Content Include="DefaultPredicates.xml">
-      <SubType>Designer</SubType>
+    <Content Include="Config\GenderSubstitutions.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="GenderSubstitutions.xml" />
-    <Content Include="Person2Substitutions.xml" />
-    <Content Include="PersonSubstitutions.xml" />
-    <Content Include="Settings.xml" />
-    <Content Include="Splitters.xml" />
-    <Content Include="Substitutions.xml" />
+    <Content Include="Config\Person2Substitutions.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Config\PersonSubstitutions.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Config\Splitters.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Config\Substitutions.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

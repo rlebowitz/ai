@@ -1,5 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<root>
+﻿<Substitutions>
   <item name="=REPLY" value="" />
   <item name="NAME=RESET" value="" />
   <item name=":-)" value=" smile " />
@@ -273,4 +272,4 @@
   <item name=",WHAT " value=". what " />
   <item name=", DO " value=". do " />
   <item name=",DO " value=". do " />
-</root>
+</Substitutions>
