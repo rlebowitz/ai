@@ -68,6 +68,7 @@
     <Compile Include="Normalize\StripIllegalCharactersTests.cs" />
     <Compile Include="RequestTests.cs" />
     <Compile Include="ResultTests.cs" />
+    <Compile Include="SymSpellTests.cs" />
     <Compile Include="SpellTests.cs" />
     <Compile Include="TagTests\BotTagTests.cs" />
     <Compile Include="TagTests\ConditionTagTests.cs" />

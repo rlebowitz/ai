@@ -15,7 +15,7 @@ namespace AIMLbot.Spell
     public class Spelling
     {
         private readonly Dictionary<string, int> _dictionary = new Dictionary<string, int>();
-        private static readonly Regex Words = new Regex(@"\b([a-ZA-Z]+)\b", RegexOptions.Compiled);
+        private static readonly Regex Words = new Regex(@"\b([a-zA-Z]+)\b", RegexOptions.Compiled);
 
         public Spelling()
         {
@@ -82,46 +82,23 @@ namespace AIMLbot.Spell
 
         private static List<string> Edits(string word)
         {
-            var splits = new List<Tuple<string, string>>();
-            var transposes = new List<string>();
-            var deletes = new List<string>();
             var replaces = new List<string>();
             var inserts = new List<string>();
 
             // Splits
-            for (var i = 0; i < word.Length; i++)
-            {
-                var tuple = new Tuple<string, string>(word.Substring(0, i), word.Substring(i));
-                splits.Add(tuple);
-            }
+            var splits = word.Select((t, i) => new Tuple<string, string>(word.Substring(0, i), word.Substring(i))).ToList();
 
             // Deletes
-            for (var i = 0; i < splits.Count; i++)
-            {
-                string a = splits[i].Item1;
-                string b = splits[i].Item2;
-                if (!string.IsNullOrEmpty(b))
-                {
-                    deletes.Add(a + b.Substring(1));
-                }
-            }
+            var deletes = (from t in splits let a = t.Item1 let b = t.Item2 where !string.IsNullOrEmpty(b) select a + b.Substring(1)).ToList();
 
             // Transposes
-            for (var i = 0; i < splits.Count; i++)
-            {
-                string a = splits[i].Item1;
-                string b = splits[i].Item2;
-                if (b.Length > 1)
-                {
-                    transposes.Add(a + b[1] + b[0] + b.Substring(2));
-                }
-            }
+            var transposes = (from t in splits let a = t.Item1 let b = t.Item2 where b.Length > 1 select a + b[1] + b[0] + b.Substring(2)).ToList();
 
             // Replaces
-            for (int i = 0; i < splits.Count; i++)
+            foreach (Tuple<string, string> t in splits)
             {
-                string a = splits[i].Item1;
-                string b = splits[i].Item2;
+                string a = t.Item1;
+                string b = t.Item2;
                 if (!string.IsNullOrEmpty(b))
                 {
                     for (var c = 'a'; c <= 'z'; c++)
@@ -132,10 +109,10 @@ namespace AIMLbot.Spell
             }
 
             // Inserts
-            for (int i = 0; i < splits.Count; i++)
+            foreach (Tuple<string, string> t in splits)
             {
-                string a = splits[i].Item1;
-                string b = splits[i].Item2;
+                string a = t.Item1;
+                string b = t.Item2;
                 for (var c = 'a'; c <= 'z'; c++)
                 {
                     inserts.Add(a + c + b);
