@@ -104,15 +104,21 @@ namespace AIMLbot.Spell
         //for every word there all deletes with an edit distance of 1..editDistanceMax created and added to the dictionary
         //every delete entry has a suggestions list, which points to the original term(s) it was created from
         //The dictionary may be dynamically updated (word frequency and new words) at any time by calling createDictionaryEntry
-        private bool CreateDictionaryEntry(string key, string language)
+        private bool CreateDictionaryEntry(string key)
         {
             bool result = false;
             DictionaryItem value = null;
             object valueo;
-            if (Dictionary.TryGetValue(language + key, out valueo))
+            if (Dictionary.TryGetValue(key, out valueo))
             {
                 //int or dictionaryItem? delete existed before word!
-                if (valueo is int) { var tmp = (int)valueo; value = new DictionaryItem(); value.Suggestions.Add(tmp); Dictionary[language + key] = value; }
+                if (valueo is int)
+                {
+                    var tmp = (int)valueo;
+                    value = new DictionaryItem();
+                    value.Suggestions.Add(tmp);
+                    Dictionary[key] = value;
+                }
 
                 //already exists:
                 //1. word appears several times
@@ -121,15 +127,17 @@ namespace AIMLbot.Spell
                 {
                     value = (valueo as DictionaryItem);
                 }
-
                 //prevent overflow
-                if (value != null && value.Count < int.MaxValue) value.Count++;
+                if (value != null && value.Count < int.MaxValue)
+                {
+                    value.Count++;
+                }
             }
             else if (Wordlist.Count < int.MaxValue)
             {
                 value = new DictionaryItem();
                 value.Count++;
-                Dictionary.Add(language + key, value);
+                Dictionary.Add(key, value);
 
                 if (key.Length > Maxlength) Maxlength = key.Length;
             }
@@ -143,6 +151,10 @@ namespace AIMLbot.Spell
             {
                 //word2index
                 Wordlist.Add(key);
+                if (key.Equals("I", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    Console.WriteLine(key);
+                }
                 var keyint = Wordlist.Count - 1;
 
                 result = true;
@@ -151,7 +163,7 @@ namespace AIMLbot.Spell
                 foreach (var delete in Edits(key, 0, new HashSet<string>()))
                 {
                     object value2;
-                    if (Dictionary.TryGetValue(language + delete, out value2))
+                    if (Dictionary.TryGetValue(delete, out value2))
                     {
                         //already exists:
                         //1. word1==deletes(word2) 
@@ -160,37 +172,41 @@ namespace AIMLbot.Spell
                         if (value2 is int)
                         {
                             //transformes int to dictionaryItem
-                            var tmp = (int)value2; DictionaryItem di = new DictionaryItem(); di.Suggestions.Add(tmp); Dictionary[language + delete] = di;
-                            if (!di.Suggestions.Contains(keyint)) AddLowestDistance(di, key, keyint, delete);
+                            var tmp = (int)value2;
+                            DictionaryItem di = new DictionaryItem();
+                            di.Suggestions.Add(tmp);
+                            Dictionary[delete] = di;
+                            if (!di.Suggestions.Contains(keyint))
+                            {
+                                AddLowestDistance(di, key, keyint, delete);
+                            }
                         }
                         else
                         {
                             var dictionaryItem = value2 as DictionaryItem;
-                            if (dictionaryItem != null && !dictionaryItem.Suggestions.Contains(keyint)) AddLowestDistance((DictionaryItem) value2, key, keyint, delete);
+                            if (dictionaryItem != null && !dictionaryItem.Suggestions.Contains(keyint))
+                            {
+                                AddLowestDistance((DictionaryItem) value2, key, keyint, delete);
+                            }
                         }
                     }
                     else
                     {
-                        Dictionary.Add(language + delete, keyint);
+                        Dictionary.Add(delete, keyint);
                     }
-
                 }
             }
             return result;
         }
 
         //create a frequency dictionary from a corpus
-        public void CreateDictionary(string corpus, string language)
+        public void CreateDictionary(string corpus)
         {
             if (!File.Exists(corpus))
             {
-                Console.Error.WriteLine("File not found: " + corpus);
-                return;
+                throw new FileNotFoundException("File not found: " + corpus);
             }
 
-            Console.Write(@"Creating dictionary ...");
-            var stopWatch = new Stopwatch();
-            stopWatch.Start();
             long wordCount = 0;
 
             using (var sr = new StreamReader(corpus))
@@ -199,16 +215,15 @@ namespace AIMLbot.Spell
                 //process a single line at a time only for memory efficiency
                 while ((line = sr.ReadLine()) != null)
                 {
-                    wordCount += ParseWords(line).LongCount(key => CreateDictionaryEntry(key, language));
+                    wordCount += ParseWords(line).LongCount(CreateDictionaryEntry);
                 }
             }
 
             Wordlist.TrimExcess();
             var count = wordCount.ToString("N0");
             var entries = Dictionary.Count.ToString("N0");
-            var ms = stopWatch.ElapsedMilliseconds;
             var mb = (Process.GetCurrentProcess().PrivateMemorySize64/1000000).ToString("N0");
-            var s = $@"Dictionary: {count} words, {entries} entries, edit distance={EditDistanceMax} in {ms} ms {mb} MB";
+            var s = $@"Dictionary: {count} words, {entries} entries, edit distance={EditDistanceMax} {mb} MB";
             Console.WriteLine(s);
         }
 
@@ -242,7 +257,7 @@ namespace AIMLbot.Spell
             return deletes;
         }
 
-        private List<SuggestItem> Lookup(string input, string language, int editDistanceMax)
+        private List<SuggestItem> Lookup(string input, int editDistanceMax)
         {
             //save some time
             if (input.Length - editDistanceMax > Maxlength) return new List<SuggestItem>();
@@ -270,7 +285,7 @@ namespace AIMLbot.Spell
 
                 //read candidate entry from dictionary
                 object valueo;
-                if (Dictionary.TryGetValue(language + candidate, out valueo))
+                if (Dictionary.TryGetValue(candidate, out valueo))
                 {
                     var value = new DictionaryItem();
                     if (valueo is int) value.Suggestions.Add((int)valueo); else value = (DictionaryItem)valueo;
@@ -326,7 +341,7 @@ namespace AIMLbot.Spell
 
                             if (distance > editDistanceMax) continue;
                             object value2;
-                            if (!Dictionary.TryGetValue(language + suggestion, out value2)) continue;
+                            if (!Dictionary.TryGetValue(suggestion, out value2)) continue;
                             if (value2 == null) continue;
                             var item = (DictionaryItem)value2;
                             var si = new SuggestItem(suggestion, item.Count, distance);
@@ -354,10 +369,10 @@ namespace AIMLbot.Spell
             return suggestions;
         }
 
-        public SuggestItem Correct(string input, string language)
+        public SuggestItem Correct(string input)
         {
             //check in dictionary for existence and frequency; sort by ascending edit distance, then by descending word frequency
-            var suggestions = Lookup(input, language, EditDistanceMax);
+            var suggestions = Lookup(input, EditDistanceMax);
 
             //display term and frequency
             foreach (var suggestion in suggestions)
