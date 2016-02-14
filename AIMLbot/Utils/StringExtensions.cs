@@ -56,5 +56,6 @@ namespace AIMLbot.Utils
             sb.Replace(".", @"\.");
             return sb.ToString();
         }
+
     }
 }

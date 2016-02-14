@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using AIMLbot.Spell;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -64,34 +65,15 @@ namespace AIMLbot.UnitTest
         {
             // sees speed instead of spelled (see notes on norvig.com)
             const string sentence = "I havve speled thes woord wwrong";
-            var correction = sentence.Split(' ')
-                .Aggregate("", (current, item) => current + " " + _spelling.Correct(item));
-            Assert.AreEqual("I have speed the word wrong", correction);
+            char[] splitters = new[] {' '};
+            var words = sentence.Split(splitters, StringSplitOptions.RemoveEmptyEntries);
+            string[] result = new string[words.Length];
+            for (var i = 0;i< words.Length;i++)
+            {
+                result[i] = _spelling.Correct(words[i]);
+            }
+            Assert.AreEqual("i have speed the word wrong", string.Join(" ", result));
         }
 
-        #region Additional test attributes
-
-        //
-        // You can use the following additional attributes as you write your tests:
-        //
-        // Use ClassInitialize to run code before running the first test in the class
-        //[ClassInitialize]
-        //public static void MyClassInitialize(TestContext testContext) {
-        //}
-        //
-        // Use ClassCleanup to run code after all tests in a class have run
-        // [ClassCleanup()]
-        // public static void MyClassCleanup() { }
-        //
-        // Use TestInitialize to run code before running each test 
-        // [TestInitialize()]
-        // public void MyTestInitialize() { }
-        //
-        // Use TestCleanup to run code after each test has run
-        // [TestCleanup()]
-        // public void MyTestCleanup() { }
-        //
-
-        #endregion
     }
 }
