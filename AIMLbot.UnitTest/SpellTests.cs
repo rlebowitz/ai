@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+using System.IO;
 using AIMLbot.Spell;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -17,6 +17,9 @@ namespace AIMLbot.UnitTest
         public NorvigSpellTests()
         {
             _spelling = new Spelling();
+            //           _spelling.LoadFromBinaryFile();
+            _spelling.ReadTextFile();
+            _spelling.SaveToBinaryFile();
         }
 
         /// <summary>
@@ -24,6 +27,20 @@ namespace AIMLbot.UnitTest
         ///     information about and functionality for the current test run.
         /// </summary>
         public TestContext TestContext { get; set; }
+
+        [TestMethod]
+        public void TestSaveBinary()
+        {
+            _spelling.SaveToBinaryFile();
+            var fullPath = $@"{Environment.CurrentDirectory}\dictionary.dat";
+            Assert.IsTrue(File.Exists(fullPath));
+        }
+
+        [TestMethod]
+        public void TestReadBinary()
+        {
+            _spelling.LoadFromBinaryFile();
+        }
 
         [TestMethod]
         public void TestSpelling1()
@@ -65,15 +82,14 @@ namespace AIMLbot.UnitTest
         {
             // sees speed instead of spelled (see notes on norvig.com)
             const string sentence = "I havve speled thes woord wwrong";
-            char[] splitters = new[] {' '};
+            char[] splitters = {' '};
             var words = sentence.Split(splitters, StringSplitOptions.RemoveEmptyEntries);
-            string[] result = new string[words.Length];
-            for (var i = 0;i< words.Length;i++)
+            var result = new string[words.Length];
+            for (var i = 0; i < words.Length; i++)
             {
                 result[i] = _spelling.Correct(words[i]);
             }
             Assert.AreEqual("i have speed the word wrong", string.Join(" ", result));
         }
-
     }
 }

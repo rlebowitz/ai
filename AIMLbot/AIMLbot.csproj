@@ -93,7 +93,7 @@
     <Compile Include="Utils\AIMLLoader.cs" />
     <Compile Include="Utils\AimlConfigurationHandler.cs" />
     <Compile Include="Utils\AIMLTagHandler.cs" />
-    <Compile Include="Utils\TitleCaseExtension.cs" />
+    <Compile Include="Utils\TitleCase.cs" />
     <Compile Include="Utils\NodeExtensions.cs" />
     <Compile Include="Utils\DictionaryExtensions.cs" />
     <Compile Include="Utils\RandomStringGenerator.cs" />

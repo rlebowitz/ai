@@ -4,7 +4,10 @@ using System.Text.RegularExpressions;
 
 namespace AIMLbot.Utils
 {
-    public static class TitleCaseExtension
+    /// <summary>
+    /// https://gist.github.com/andrewjk/3186574
+    /// </summary>
+    public class TitleCase
     {
         /// <summary>
         /// Converts the specified string to title case.
@@ -23,7 +26,7 @@ namespace AIMLbot.Utils
         ///	</remarks>
         /// <param name="text">The string to convert to title case.</param>
         /// <returns>A string that consists of the text converted to title case.</returns>
-        public static string ToTitleCase(string text)
+        public string ToTitleCase(string text)
         {
             if (text == null)
             {
@@ -56,7 +59,7 @@ namespace AIMLbot.Utils
             return result;
         }
 
-        private static string ProcessTitlePart(string[] parts, int index, char previousCharacter, string[] lowerCaseWords)
+        private string ProcessTitlePart(string[] parts, int index, char previousCharacter, string[] lowerCaseWords)
         {
             string result = parts[index];
 
@@ -99,7 +102,7 @@ namespace AIMLbot.Utils
             else
             {
                 // The first letter should be capitalized (ignoring things like an opening parenthesis)
-                for (int j = 0; j < parts[index].Length; j++)
+                for (var j = 0; j < parts[index].Length; j++)
                 {
                     if (char.IsLetter(parts[index][j]))
                     {
@@ -112,7 +115,7 @@ namespace AIMLbot.Utils
             return result;
         }
 
-        private static string ProcessTitleSubParts(string part, char separator, char previousCharacter, string[] lowerCaseWords)
+        private string ProcessTitleSubParts(string part, char separator, char previousCharacter, string[] lowerCaseWords)
         {
             string[] subParts = part.Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries);
             for (var j = 0; j < subParts.Length; j++)

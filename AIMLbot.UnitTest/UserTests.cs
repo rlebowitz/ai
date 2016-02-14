@@ -13,7 +13,6 @@ namespace AIMLbot.UnitTest
 
     {
 
-        private static ChatBot _chatBot;
         private User _user;
 
         /// <summary>
@@ -21,27 +20,6 @@ namespace AIMLbot.UnitTest
         ///information about and functionality for the current test run.
         ///</summary>
         public TestContext TestContext { get; set; }
-
-        #region Additional test attributes
-        //
-        // You can use the following additional attributes as you write your tests:
-        //
-        // Use ClassInitialize to run code before running the first test in the class
-        [ClassInitialize()]
-        public static void ClassInitialize(TestContext testContext)
-        {
-            _chatBot = new ChatBot();
-
-        }
-
-        //  Use ClassCleanup to run code after all tests in a class have run
-        [ClassCleanup()]
-        public static void ClassCleanup()
-        {
-            
-        }
-         #endregion
-
 
         [TestMethod]
         public void TestConstructorPopulatesUserObject()

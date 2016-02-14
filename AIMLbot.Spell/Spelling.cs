@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
 
 namespace AIMLbot.Spell
@@ -14,12 +16,12 @@ namespace AIMLbot.Spell
     /// </remarks>
     public class Spelling
     {
-        private readonly Dictionary<string, int> _dictionary = new Dictionary<string, int>();
+        private Dictionary<string, int> _dictionary = new Dictionary<string, int>();
         private static readonly Regex Words = new Regex(@"\b([a-zA-Z]+)\b", RegexOptions.Compiled);
 
-        public Spelling()
+        public void ReadTextFile(string fileName = "big.txt")
         {
-            using (var file = new StreamReader("big.txt"))
+            using (var file = new StreamReader(fileName))
             {
                 string line;
                 while ((line = file.ReadLine()) != null)
@@ -28,6 +30,59 @@ namespace AIMLbot.Spell
                 }
             }
         }
+
+        public void SaveToBinaryFile(string fileName = "dictionary.dat")
+        {
+            var fullPath = $@"{Environment.CurrentDirectory}\{fileName}";
+            SaveToBinaryFile(new FileInfo(fullPath));
+        }
+
+        /// <summary>
+        ///     Saves the dictionary to a binary file to avoid processing the text each time the
+        ///     spell checker is used.
+        /// </summary>
+        public void SaveToBinaryFile(FileInfo fileInfo)
+        {
+            if (fileInfo.Exists)
+            {
+                fileInfo.Delete();
+            }
+            using (var stream = fileInfo.Create())
+            {
+                var formatter = new BinaryFormatter();
+                formatter.Serialize(stream, _dictionary);
+            }
+        }
+
+        /// <summary>
+        ///     Loads a dump of the dictionary into memory 
+        /// </summary>
+        public void LoadFromBinaryFile(string fileName = "dictionary.dat")
+        {
+            var fullPath = $@"{Environment.CurrentDirectory}\{fileName}";
+            LoadFromBinaryFile(new FileInfo(fullPath));
+        }
+
+        /// <summary>
+        ///     Loads a dump of the graphmaster into memory so avoiding processing the AIML files again
+        /// </summary>
+        /// <param name="fileInfo">The specific file to load.</param>
+        public void LoadFromBinaryFile(FileInfo fileInfo)
+        {
+            if (fileInfo != null && fileInfo.Exists)
+            {
+                using (var stream = fileInfo.OpenRead())
+                {
+                    var formatter = new BinaryFormatter();
+                    _dictionary = (Dictionary<string, int>)formatter.Deserialize(stream);
+                }
+            }
+            else
+            {
+                throw new FileNotFoundException("Unable to find the spelling dictionary.");
+            }
+        }
+
 
         private void Parse(string line) { 
             var matches = Words.Matches(line);            

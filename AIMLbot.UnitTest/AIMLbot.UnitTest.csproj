@@ -68,7 +68,6 @@
     <Compile Include="Normalize\StripIllegalCharactersTests.cs" />
     <Compile Include="RequestTests.cs" />
     <Compile Include="ResultTests.cs" />
-    <Compile Include="SymSpellTests.cs" />
     <Compile Include="SpellTests.cs" />
     <Compile Include="TagTests\BotTagTests.cs" />
     <Compile Include="TagTests\ConditionTagTests.cs" />
@@ -103,6 +102,7 @@
     <Compile Include="TagTests\VersionTagTests.cs" />
     <Compile Include="UserTests.cs" />
     <Compile Include="Utils\NodeSearcherTests.cs" />
+    <Compile Include="Utils\TitleCaseTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AIMLbot.Spell\AIMLbot.Spell.csproj">
