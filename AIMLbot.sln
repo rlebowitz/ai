@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIMLbot", "AIMLbot\AIMLbot.csproj", "{9C87D82C-0E27-4995-A2CB-72BCB84EF2E2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIMLbot.UnitTest", "AIMLbot.UnitTest\AIMLbot.UnitTest.csproj", "{B2022A3B-3C70-472C-9D9D-AC6D5ABC0AC1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIMLbot.Spell", "AIMLbot.Spell\AIMLbot.Spell.csproj", "{F0162102-71F2-4A30-AB2B-3621ABA0874C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIMLbot.UI", "AIMLbot.UI\AIMLbot.UI.csproj", "{5AD08A15-6E78-441D-B3D6-E08009F1F33E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{F0162102-71F2-4A30-AB2B-3621ABA0874C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F0162102-71F2-4A30-AB2B-3621ABA0874C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F0162102-71F2-4A30-AB2B-3621ABA0874C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5AD08A15-6E78-441D-B3D6-E08009F1F33E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AD08A15-6E78-441D-B3D6-E08009F1F33E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AD08A15-6E78-441D-B3D6-E08009F1F33E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AD08A15-6E78-441D-B3D6-E08009F1F33E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
