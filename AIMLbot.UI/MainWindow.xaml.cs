@@ -1,33 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using AIMLbot.Utils;
 
 namespace AIMLbot.UI
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    ///     Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
+        readonly ChatBot _chatBot = new ChatBot();
+
         public MainWindow()
         {
             InitializeComponent();
+            var loader = new AIMLLoader();
+            const string path = @"Human.aiml";
+            loader.LoadAIML(path);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-
+            var text = TextBox.Text;
+            if (String.IsNullOrWhiteSpace(text))
+            {
+                return;
+            }
+            var output = _chatBot.Chat(text, "1");
+            TextBlock.Text = output.Output;
         }
     }
 }
