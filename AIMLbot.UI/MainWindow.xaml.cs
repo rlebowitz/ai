@@ -15,7 +15,7 @@ namespace AIMLbot.UI
         {
             InitializeComponent();
             var loader = new AIMLLoader();
-            const string path = @"Human.aiml";
+            const string path = @"Alice.aiml";
             loader.LoadAIML(path);
         }
 
