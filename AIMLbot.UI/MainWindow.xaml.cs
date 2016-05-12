@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using AIMLbot.Utils;
+using System.Windows.Input;
 
 namespace AIMLbot.UI
 {
@@ -15,7 +16,7 @@ namespace AIMLbot.UI
         {
             InitializeComponent();
             var loader = new AIMLLoader();
-            const string path = @"Alice.aiml";
+            const string path = @"Human.aiml";
             loader.LoadAIML(path);
         }
 
@@ -29,5 +30,16 @@ namespace AIMLbot.UI
             var output = _chatBot.Chat(text, "1");
             TextBlock.Text = output.Output;
         }
+
+        private void TextBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                e.Handled = true;
+                Button_Click(sender, e);
+            }
+        }
+
+      
     }
 }
